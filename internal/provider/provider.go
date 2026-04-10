@@ -319,6 +319,7 @@ func (p *PanosProvider) Configure(ctx context.Context, req provider.ConfigureReq
 // DataSources defines the data sources for this provider.
 func (p *PanosProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
+		NewAdministratorDataSource,
 		NewAdminRoleDataSource,
 		NewAuthenticationProfileDataSource,
 		NewCertificateDataSource,
@@ -337,13 +338,15 @@ func (p *PanosProvider) DataSources(_ context.Context) []func() datasource.DataS
 		NewSystemLogSettingsDataSource,
 		NewUseridLogSettingsDataSource,
 		NewNtpSettingsDataSource,
-		NewDataFilteringProfileDataSource,
+		NewDataFilteringSecurityProfileDataSource,
 		NewDosProtectionProfileDataSource,
+		NewEmailServerProfileDataSource,
 		NewLdapProfileDataSource,
 		NewMfaServerProfileDataSource,
 		NewPasswordProfileDataSource,
 		NewRadiusProfileDataSource,
 		NewSamlIdpProfileDataSource,
+		NewSnmpTrapProfileDataSource,
 		NewSyslogProfileDataSource,
 		NewTacacsPlusProfileDataSource,
 		NewProxySettingsDataSource,
@@ -401,6 +404,7 @@ func (p *PanosProvider) DataSources(_ context.Context) []func() datasource.DataS
 		NewExternalDynamicListDataSource,
 		NewAntivirusSecurityProfileDataSource,
 		NewCertificateProfileDataSource,
+		NewDecryptionProfileDataSource,
 		NewFileBlockingSecurityProfileDataSource,
 		NewIkeCryptoProfileDataSource,
 		NewIpsecCryptoProfileDataSource,
@@ -433,6 +437,7 @@ func (p *PanosProvider) DataSources(_ context.Context) []func() datasource.DataS
 // Resources defines the data sources for this provider.
 func (p *PanosProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		NewAdministratorResource,
 		NewAdminRoleResource,
 		NewAuthenticationProfileResource,
 		NewCertificateImportResource,
@@ -451,13 +456,15 @@ func (p *PanosProvider) Resources(_ context.Context) []func() resource.Resource 
 		NewSystemLogSettingsResource,
 		NewUseridLogSettingsResource,
 		NewNtpSettingsResource,
-		NewDataFilteringProfileResource,
+		NewDataFilteringSecurityProfileResource,
 		NewDosProtectionProfileResource,
+		NewEmailServerProfileResource,
 		NewLdapProfileResource,
 		NewMfaServerProfileResource,
 		NewPasswordProfileResource,
 		NewRadiusProfileResource,
 		NewSamlIdpProfileResource,
+		NewSnmpTrapProfileResource,
 		NewSyslogProfileResource,
 		NewTacacsPlusProfileResource,
 		NewProxySettingsResource,
@@ -516,6 +523,7 @@ func (p *PanosProvider) Resources(_ context.Context) []func() resource.Resource 
 		NewExternalDynamicListResource,
 		NewAntivirusSecurityProfileResource,
 		NewCertificateProfileResource,
+		NewDecryptionProfileResource,
 		NewFileBlockingSecurityProfileResource,
 		NewIkeCryptoProfileResource,
 		NewIpsecCryptoProfileResource,
@@ -597,6 +605,9 @@ var resourceFuncMap = map[string]resourceFuncs{
 	"panos_administrative_tag": resourceFuncs{
 		CreateImportId: AdministrativeTagImportStateCreator,
 	},
+	"panos_administrator": resourceFuncs{
+		CreateImportId: AdministratorImportStateCreator,
+	},
 	"panos_aggregate_interface": resourceFuncs{
 		CreateImportId: AggregateInterfaceImportStateCreator,
 	},
@@ -666,14 +677,17 @@ var resourceFuncMap = map[string]resourceFuncs{
 	"panos_custom_vulnerability": resourceFuncs{
 		CreateImportId: CustomVulnerabilityImportStateCreator,
 	},
-	"panos_data_filtering_profile": resourceFuncs{
-		CreateImportId: DataFilteringProfileImportStateCreator,
+	"panos_data_filtering_security_profile": resourceFuncs{
+		CreateImportId: DataFilteringSecurityProfileImportStateCreator,
 	},
 	"panos_decryption_policy": resourceFuncs{
 		CreateImportId: DecryptionPolicyImportStateCreator,
 	},
 	"panos_decryption_policy_rules": resourceFuncs{
 		CreateImportId: DecryptionPolicyRulesImportStateCreator,
+	},
+	"panos_decryption_profile": resourceFuncs{
+		CreateImportId: DecryptionProfileImportStateCreator,
 	},
 	"panos_default_security_policy": resourceFuncs{
 		CreateImportId: DefaultSecurityPolicyImportStateCreator,
@@ -692,6 +706,9 @@ var resourceFuncMap = map[string]resourceFuncs{
 	},
 	"panos_dynamic_user_group": resourceFuncs{
 		CreateImportId: DynamicUserGroupImportStateCreator,
+	},
+	"panos_email_server_profile": resourceFuncs{
+		CreateImportId: EmailServerProfileImportStateCreator,
 	},
 	"panos_ethernet_interface": resourceFuncs{
 		CreateImportId: EthernetInterfaceImportStateCreator,
@@ -818,6 +835,9 @@ var resourceFuncMap = map[string]resourceFuncs{
 	},
 	"panos_service_group": resourceFuncs{
 		CreateImportId: ServiceGroupImportStateCreator,
+	},
+	"panos_snmp_trap_profile": resourceFuncs{
+		CreateImportId: SnmpTrapProfileImportStateCreator,
 	},
 	"panos_ssl_tls_service_profile": resourceFuncs{
 		CreateImportId: SslTlsServiceProfileImportStateCreator,
