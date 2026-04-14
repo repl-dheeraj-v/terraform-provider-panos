@@ -54,13 +54,13 @@ type DecryptionProfileDataSourceFilter struct {
 }
 
 type DecryptionProfileDataSourceModel struct {
-	Location             types.Object `tfsdk:"location"`
-	Name                 types.String `tfsdk:"name"`
-	Description          types.String `tfsdk:"description"`
-	SslForwardProxy      types.Object `tfsdk:"ssl_forward_proxy"`
-	SslInboundInspection types.Object `tfsdk:"ssl_inbound_inspection"`
-	SslNoProxy           types.Object `tfsdk:"ssl_no_proxy"`
-	SslProtocolSettings  types.Object `tfsdk:"ssl_protocol_settings"`
+	Location            types.Object `tfsdk:"location"`
+	Name                types.String `tfsdk:"name"`
+	Description         types.String `tfsdk:"description"`
+	SslForwardProxy     types.Object `tfsdk:"ssl_forward_proxy"`
+	SslInboundProxy     types.Object `tfsdk:"ssl_inbound_proxy"`
+	SslNoProxy          types.Object `tfsdk:"ssl_no_proxy"`
+	SslProtocolSettings types.Object `tfsdk:"ssl_protocol_settings"`
 }
 type DecryptionProfileDataSourceSslForwardProxyObject struct {
 	AutoIncludeAltname      types.Bool `tfsdk:"auto_include_altname"`
@@ -75,10 +75,12 @@ type DecryptionProfileDataSourceSslForwardProxyObject struct {
 	RestrictCertExts        types.Bool `tfsdk:"restrict_cert_exts"`
 	StripAlpn               types.Bool `tfsdk:"strip_alpn"`
 }
-type DecryptionProfileDataSourceSslInboundInspectionObject struct {
-	BlockIfNoResource       types.Bool `tfsdk:"block_if_no_resource"`
-	BlockUnsupportedCipher  types.Bool `tfsdk:"block_unsupported_cipher"`
-	BlockUnsupportedVersion types.Bool `tfsdk:"block_unsupported_version"`
+type DecryptionProfileDataSourceSslInboundProxyObject struct {
+	BlockIfNoResource             types.Bool `tfsdk:"block_if_no_resource"`
+	BlockUnsupportedCipher        types.Bool `tfsdk:"block_unsupported_cipher"`
+	BlockUnsupportedVersion       types.Bool `tfsdk:"block_unsupported_version"`
+	BlockIfHsmUnavailable         types.Bool `tfsdk:"block_if_hsm_unavailable"`
+	BlockTls13DowngradeNoResource types.Bool `tfsdk:"block_tls13_downgrade_no_resource"`
 }
 type DecryptionProfileDataSourceSslNoProxyObject struct {
 	BlockExpiredCertificate types.Bool `tfsdk:"block_expired_certificate"`
@@ -108,7 +110,7 @@ func (o *DecryptionProfileDataSourceModel) AttributeTypes() map[string]attr.Type
 
 	var sslForwardProxyObj *DecryptionProfileDataSourceSslForwardProxyObject
 
-	var sslInboundInspectionObj *DecryptionProfileDataSourceSslInboundInspectionObject
+	var sslInboundProxyObj *DecryptionProfileDataSourceSslInboundProxyObject
 
 	var sslNoProxyObj *DecryptionProfileDataSourceSslNoProxyObject
 
@@ -122,8 +124,8 @@ func (o *DecryptionProfileDataSourceModel) AttributeTypes() map[string]attr.Type
 		"ssl_forward_proxy": types.ObjectType{
 			AttrTypes: sslForwardProxyObj.AttributeTypes(),
 		},
-		"ssl_inbound_inspection": types.ObjectType{
-			AttrTypes: sslInboundInspectionObj.AttributeTypes(),
+		"ssl_inbound_proxy": types.ObjectType{
+			AttrTypes: sslInboundProxyObj.AttributeTypes(),
 		},
 		"ssl_no_proxy": types.ObjectType{
 			AttrTypes: sslNoProxyObj.AttributeTypes(),
@@ -165,20 +167,22 @@ func (o DecryptionProfileDataSourceSslForwardProxyObject) AncestorName() string 
 func (o DecryptionProfileDataSourceSslForwardProxyObject) EntryName() *string {
 	return nil
 }
-func (o *DecryptionProfileDataSourceSslInboundInspectionObject) AttributeTypes() map[string]attr.Type {
+func (o *DecryptionProfileDataSourceSslInboundProxyObject) AttributeTypes() map[string]attr.Type {
 
 	return map[string]attr.Type{
-		"block_if_no_resource":      types.BoolType,
-		"block_unsupported_cipher":  types.BoolType,
-		"block_unsupported_version": types.BoolType,
+		"block_if_no_resource":              types.BoolType,
+		"block_unsupported_cipher":          types.BoolType,
+		"block_unsupported_version":         types.BoolType,
+		"block_if_hsm_unavailable":          types.BoolType,
+		"block_tls13_downgrade_no_resource": types.BoolType,
 	}
 }
 
-func (o DecryptionProfileDataSourceSslInboundInspectionObject) AncestorName() string {
-	return "ssl-inbound-inspection"
+func (o DecryptionProfileDataSourceSslInboundProxyObject) AncestorName() string {
+	return "ssl-inbound-proxy"
 }
 
-func (o DecryptionProfileDataSourceSslInboundInspectionObject) EntryName() *string {
+func (o DecryptionProfileDataSourceSslInboundProxyObject) EntryName() *string {
 	return nil
 }
 func (o *DecryptionProfileDataSourceSslNoProxyObject) AttributeTypes() map[string]attr.Type {
@@ -245,19 +249,19 @@ func (o *DecryptionProfileDataSourceModel) CopyToPango(ctx context.Context, clie
 			return diags
 		}
 	}
-	var sslInboundInspection_entry *decryption.SslInboundInspection
-	if !o.SslInboundInspection.IsUnknown() && !o.SslInboundInspection.IsNull() {
-		if *obj != nil && (*obj).SslInboundInspection != nil {
-			sslInboundInspection_entry = (*obj).SslInboundInspection
+	var sslInboundProxy_entry *decryption.SslInboundProxy
+	if !o.SslInboundProxy.IsUnknown() && !o.SslInboundProxy.IsNull() {
+		if *obj != nil && (*obj).SslInboundProxy != nil {
+			sslInboundProxy_entry = (*obj).SslInboundProxy
 		} else {
-			sslInboundInspection_entry = new(decryption.SslInboundInspection)
+			sslInboundProxy_entry = new(decryption.SslInboundProxy)
 		}
-		var object *DecryptionProfileDataSourceSslInboundInspectionObject
-		diags.Append(o.SslInboundInspection.As(ctx, &object, basetypes.ObjectAsOptions{})...)
+		var object *DecryptionProfileDataSourceSslInboundProxyObject
+		diags.Append(o.SslInboundProxy.As(ctx, &object, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
 			return diags
 		}
-		diags.Append(object.CopyToPango(ctx, client, ancestors, &sslInboundInspection_entry, ev)...)
+		diags.Append(object.CopyToPango(ctx, client, ancestors, &sslInboundProxy_entry, ev)...)
 		if diags.HasError() {
 			return diags
 		}
@@ -303,7 +307,7 @@ func (o *DecryptionProfileDataSourceModel) CopyToPango(ctx context.Context, clie
 	(*obj).Name = o.Name.ValueString()
 	(*obj).Description = description_value
 	(*obj).SslForwardProxy = sslForwardProxy_entry
-	(*obj).SslInboundInspection = sslInboundInspection_entry
+	(*obj).SslInboundProxy = sslInboundProxy_entry
 	(*obj).SslNoProxy = sslNoProxy_entry
 	(*obj).SslProtocolSettings = sslProtocolSettings_entry
 
@@ -340,18 +344,22 @@ func (o *DecryptionProfileDataSourceSslForwardProxyObject) CopyToPango(ctx conte
 
 	return diags
 }
-func (o *DecryptionProfileDataSourceSslInboundInspectionObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **decryption.SslInboundInspection, ev *EncryptedValuesManager) diag.Diagnostics {
+func (o *DecryptionProfileDataSourceSslInboundProxyObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **decryption.SslInboundProxy, ev *EncryptedValuesManager) diag.Diagnostics {
 	var diags diag.Diagnostics
 	blockIfNoResource_value := o.BlockIfNoResource.ValueBoolPointer()
 	blockUnsupportedCipher_value := o.BlockUnsupportedCipher.ValueBoolPointer()
 	blockUnsupportedVersion_value := o.BlockUnsupportedVersion.ValueBoolPointer()
+	blockIfHsmUnavailable_value := o.BlockIfHsmUnavailable.ValueBoolPointer()
+	blockTls13DowngradeNoResource_value := o.BlockTls13DowngradeNoResource.ValueBoolPointer()
 
 	if (*obj) == nil {
-		*obj = new(decryption.SslInboundInspection)
+		*obj = new(decryption.SslInboundProxy)
 	}
 	(*obj).BlockIfNoResource = blockIfNoResource_value
 	(*obj).BlockUnsupportedCipher = blockUnsupportedCipher_value
 	(*obj).BlockUnsupportedVersion = blockUnsupportedVersion_value
+	(*obj).BlockIfHsmUnavailable = blockIfHsmUnavailable_value
+	(*obj).BlockTls13DowngradeNoResource = blockTls13DowngradeNoResource_value
 
 	return diags
 }
@@ -434,23 +442,23 @@ func (o *DecryptionProfileDataSourceModel) CopyFromPango(ctx context.Context, cl
 		}
 	}
 
-	var sslInboundInspection_obj *DecryptionProfileDataSourceSslInboundInspectionObject
-	if o.SslInboundInspection.IsNull() {
-		sslInboundInspection_obj = new(DecryptionProfileDataSourceSslInboundInspectionObject)
+	var sslInboundProxy_obj *DecryptionProfileDataSourceSslInboundProxyObject
+	if o.SslInboundProxy.IsNull() {
+		sslInboundProxy_obj = new(DecryptionProfileDataSourceSslInboundProxyObject)
 	} else {
-		diags.Append(o.SslInboundInspection.As(ctx, &sslInboundInspection_obj, basetypes.ObjectAsOptions{})...)
+		diags.Append(o.SslInboundProxy.As(ctx, &sslInboundProxy_obj, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
 			return diags
 		}
 	}
-	sslInboundInspection_object := types.ObjectNull(sslInboundInspection_obj.AttributeTypes())
-	if obj.SslInboundInspection != nil {
-		diags.Append(sslInboundInspection_obj.CopyFromPango(ctx, client, ancestors, obj.SslInboundInspection, ev)...)
+	sslInboundProxy_object := types.ObjectNull(sslInboundProxy_obj.AttributeTypes())
+	if obj.SslInboundProxy != nil {
+		diags.Append(sslInboundProxy_obj.CopyFromPango(ctx, client, ancestors, obj.SslInboundProxy, ev)...)
 		if diags.HasError() {
 			return diags
 		}
 		var diags_tmp diag.Diagnostics
-		sslInboundInspection_object, diags_tmp = types.ObjectValueFrom(ctx, sslInboundInspection_obj.AttributeTypes(), sslInboundInspection_obj)
+		sslInboundProxy_object, diags_tmp = types.ObjectValueFrom(ctx, sslInboundProxy_obj.AttributeTypes(), sslInboundProxy_obj)
 		diags.Append(diags_tmp...)
 		if diags.HasError() {
 			return diags
@@ -510,7 +518,7 @@ func (o *DecryptionProfileDataSourceModel) CopyFromPango(ctx context.Context, cl
 	o.Name = types.StringValue(obj.Name)
 	o.Description = description_value
 	o.SslForwardProxy = sslForwardProxy_object
-	o.SslInboundInspection = sslInboundInspection_object
+	o.SslInboundProxy = sslInboundProxy_object
 	o.SslNoProxy = sslNoProxy_object
 	o.SslProtocolSettings = sslProtocolSettings_object
 
@@ -579,7 +587,7 @@ func (o *DecryptionProfileDataSourceSslForwardProxyObject) CopyFromPango(ctx con
 	return diags
 }
 
-func (o *DecryptionProfileDataSourceSslInboundInspectionObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *decryption.SslInboundInspection, ev *EncryptedValuesManager) diag.Diagnostics {
+func (o *DecryptionProfileDataSourceSslInboundProxyObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *decryption.SslInboundProxy, ev *EncryptedValuesManager) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	var blockIfNoResource_value types.Bool
@@ -594,9 +602,19 @@ func (o *DecryptionProfileDataSourceSslInboundInspectionObject) CopyFromPango(ct
 	if obj.BlockUnsupportedVersion != nil {
 		blockUnsupportedVersion_value = types.BoolValue(*obj.BlockUnsupportedVersion)
 	}
+	var blockIfHsmUnavailable_value types.Bool
+	if obj.BlockIfHsmUnavailable != nil {
+		blockIfHsmUnavailable_value = types.BoolValue(*obj.BlockIfHsmUnavailable)
+	}
+	var blockTls13DowngradeNoResource_value types.Bool
+	if obj.BlockTls13DowngradeNoResource != nil {
+		blockTls13DowngradeNoResource_value = types.BoolValue(*obj.BlockTls13DowngradeNoResource)
+	}
 	o.BlockIfNoResource = blockIfNoResource_value
 	o.BlockUnsupportedCipher = blockUnsupportedCipher_value
 	o.BlockUnsupportedVersion = blockUnsupportedVersion_value
+	o.BlockIfHsmUnavailable = blockIfHsmUnavailable_value
+	o.BlockTls13DowngradeNoResource = blockTls13DowngradeNoResource_value
 
 	return diags
 }
@@ -724,7 +742,7 @@ func DecryptionProfileDataSourceSchema() dsschema.Schema {
 
 			"ssl_forward_proxy": DecryptionProfileDataSourceSslForwardProxySchema(),
 
-			"ssl_inbound_inspection": DecryptionProfileDataSourceSslInboundInspectionSchema(),
+			"ssl_inbound_proxy": DecryptionProfileDataSourceSslInboundProxySchema(),
 
 			"ssl_no_proxy": DecryptionProfileDataSourceSslNoProxySchema(),
 
@@ -845,7 +863,7 @@ func (o *DecryptionProfileDataSourceSslForwardProxyObject) getTypeFor(name strin
 	panic("unreachable")
 }
 
-func DecryptionProfileDataSourceSslInboundInspectionSchema() dsschema.SingleNestedAttribute {
+func DecryptionProfileDataSourceSslInboundProxySchema() dsschema.SingleNestedAttribute {
 	return dsschema.SingleNestedAttribute{
 		Description: "",
 		Optional:    true,
@@ -869,12 +887,24 @@ func DecryptionProfileDataSourceSslInboundInspectionSchema() dsschema.SingleNest
 				Optional:    true,
 				Computed:    true,
 			},
+
+			"block_if_hsm_unavailable": dsschema.BoolAttribute{
+				Description: "Block sessions when HSM is unavailable",
+				Optional:    true,
+				Computed:    true,
+			},
+
+			"block_tls13_downgrade_no_resource": dsschema.BoolAttribute{
+				Description: "Block TLS 1.3 downgrade when no resources are available",
+				Optional:    true,
+				Computed:    true,
+			},
 		},
 	}
 }
 
-func (o *DecryptionProfileDataSourceSslInboundInspectionObject) getTypeFor(name string) attr.Type {
-	schema := DecryptionProfileDataSourceSslInboundInspectionSchema()
+func (o *DecryptionProfileDataSourceSslInboundProxyObject) getTypeFor(name string) attr.Type {
+	schema := DecryptionProfileDataSourceSslInboundProxySchema()
 	if attr, ok := schema.Attributes[name]; !ok {
 		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
 	} else {
@@ -1199,13 +1229,13 @@ func DecryptionProfileResourceLocationSchema() rsschema.Attribute {
 }
 
 type DecryptionProfileResourceModel struct {
-	Location             types.Object `tfsdk:"location"`
-	Name                 types.String `tfsdk:"name"`
-	Description          types.String `tfsdk:"description"`
-	SslForwardProxy      types.Object `tfsdk:"ssl_forward_proxy"`
-	SslInboundInspection types.Object `tfsdk:"ssl_inbound_inspection"`
-	SslNoProxy           types.Object `tfsdk:"ssl_no_proxy"`
-	SslProtocolSettings  types.Object `tfsdk:"ssl_protocol_settings"`
+	Location            types.Object `tfsdk:"location"`
+	Name                types.String `tfsdk:"name"`
+	Description         types.String `tfsdk:"description"`
+	SslForwardProxy     types.Object `tfsdk:"ssl_forward_proxy"`
+	SslInboundProxy     types.Object `tfsdk:"ssl_inbound_proxy"`
+	SslNoProxy          types.Object `tfsdk:"ssl_no_proxy"`
+	SslProtocolSettings types.Object `tfsdk:"ssl_protocol_settings"`
 }
 type DecryptionProfileResourceSslForwardProxyObject struct {
 	AutoIncludeAltname      types.Bool `tfsdk:"auto_include_altname"`
@@ -1220,10 +1250,12 @@ type DecryptionProfileResourceSslForwardProxyObject struct {
 	RestrictCertExts        types.Bool `tfsdk:"restrict_cert_exts"`
 	StripAlpn               types.Bool `tfsdk:"strip_alpn"`
 }
-type DecryptionProfileResourceSslInboundInspectionObject struct {
-	BlockIfNoResource       types.Bool `tfsdk:"block_if_no_resource"`
-	BlockUnsupportedCipher  types.Bool `tfsdk:"block_unsupported_cipher"`
-	BlockUnsupportedVersion types.Bool `tfsdk:"block_unsupported_version"`
+type DecryptionProfileResourceSslInboundProxyObject struct {
+	BlockIfNoResource             types.Bool `tfsdk:"block_if_no_resource"`
+	BlockUnsupportedCipher        types.Bool `tfsdk:"block_unsupported_cipher"`
+	BlockUnsupportedVersion       types.Bool `tfsdk:"block_unsupported_version"`
+	BlockIfHsmUnavailable         types.Bool `tfsdk:"block_if_hsm_unavailable"`
+	BlockTls13DowngradeNoResource types.Bool `tfsdk:"block_tls13_downgrade_no_resource"`
 }
 type DecryptionProfileResourceSslNoProxyObject struct {
 	BlockExpiredCertificate types.Bool `tfsdk:"block_expired_certificate"`
@@ -1257,13 +1289,13 @@ func (o *DecryptionProfileResourceModel) ValidateConfig(ctx context.Context, res
 			nestedObj.ValidateConfig(ctx, resp, path.AtName("ssl_forward_proxy"))
 		}
 	}
-	if !o.SslInboundInspection.IsUnknown() && !o.SslInboundInspection.IsNull() {
-		var nestedObj DecryptionProfileResourceSslInboundInspectionObject
-		diags := o.SslInboundInspection.As(ctx, &nestedObj, basetypes.ObjectAsOptions{})
+	if !o.SslInboundProxy.IsUnknown() && !o.SslInboundProxy.IsNull() {
+		var nestedObj DecryptionProfileResourceSslInboundProxyObject
+		diags := o.SslInboundProxy.As(ctx, &nestedObj, basetypes.ObjectAsOptions{})
 		if diags.HasError() {
 			resp.Diagnostics.Append(diags...)
 		} else {
-			nestedObj.ValidateConfig(ctx, resp, path.AtName("ssl_inbound_inspection"))
+			nestedObj.ValidateConfig(ctx, resp, path.AtName("ssl_inbound_proxy"))
 		}
 	}
 	if !o.SslNoProxy.IsUnknown() && !o.SslNoProxy.IsNull() {
@@ -1289,7 +1321,7 @@ func (o *DecryptionProfileResourceModel) ValidateConfig(ctx context.Context, res
 func (o *DecryptionProfileResourceSslForwardProxyObject) ValidateConfig(ctx context.Context, resp *resource.ValidateConfigResponse, path path.Path) {
 }
 
-func (o *DecryptionProfileResourceSslInboundInspectionObject) ValidateConfig(ctx context.Context, resp *resource.ValidateConfigResponse, path path.Path) {
+func (o *DecryptionProfileResourceSslInboundProxyObject) ValidateConfig(ctx context.Context, resp *resource.ValidateConfigResponse, path path.Path) {
 }
 
 func (o *DecryptionProfileResourceSslNoProxyObject) ValidateConfig(ctx context.Context, resp *resource.ValidateConfigResponse, path path.Path) {
@@ -1328,7 +1360,7 @@ func DecryptionProfileResourceSchema() rsschema.Schema {
 
 			"ssl_forward_proxy": DecryptionProfileResourceSslForwardProxySchema(),
 
-			"ssl_inbound_inspection": DecryptionProfileResourceSslInboundInspectionSchema(),
+			"ssl_inbound_proxy": DecryptionProfileResourceSslInboundProxySchema(),
 
 			"ssl_no_proxy": DecryptionProfileResourceSslNoProxySchema(),
 
@@ -1437,7 +1469,7 @@ func (o *DecryptionProfileResourceSslForwardProxyObject) getTypeFor(name string)
 	panic("unreachable")
 }
 
-func DecryptionProfileResourceSslInboundInspectionSchema() rsschema.SingleNestedAttribute {
+func DecryptionProfileResourceSslInboundProxySchema() rsschema.SingleNestedAttribute {
 	return rsschema.SingleNestedAttribute{
 		Description: "",
 		Optional:    true,
@@ -1457,12 +1489,22 @@ func DecryptionProfileResourceSslInboundInspectionSchema() rsschema.SingleNested
 				Description: "Block sessions with unsupported protocol versions",
 				Optional:    true,
 			},
+
+			"block_if_hsm_unavailable": rsschema.BoolAttribute{
+				Description: "Block sessions when HSM is unavailable",
+				Optional:    true,
+			},
+
+			"block_tls13_downgrade_no_resource": rsschema.BoolAttribute{
+				Description: "Block TLS 1.3 downgrade when no resources are available",
+				Optional:    true,
+			},
 		},
 	}
 }
 
-func (o *DecryptionProfileResourceSslInboundInspectionObject) getTypeFor(name string) attr.Type {
-	schema := DecryptionProfileResourceSslInboundInspectionSchema()
+func (o *DecryptionProfileResourceSslInboundProxyObject) getTypeFor(name string) attr.Type {
+	schema := DecryptionProfileResourceSslInboundProxySchema()
 	if attr, ok := schema.Attributes[name]; !ok {
 		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
 	} else {
@@ -1655,7 +1697,7 @@ func (o *DecryptionProfileResourceModel) AttributeTypes() map[string]attr.Type {
 
 	var sslForwardProxyObj *DecryptionProfileResourceSslForwardProxyObject
 
-	var sslInboundInspectionObj *DecryptionProfileResourceSslInboundInspectionObject
+	var sslInboundProxyObj *DecryptionProfileResourceSslInboundProxyObject
 
 	var sslNoProxyObj *DecryptionProfileResourceSslNoProxyObject
 
@@ -1669,8 +1711,8 @@ func (o *DecryptionProfileResourceModel) AttributeTypes() map[string]attr.Type {
 		"ssl_forward_proxy": types.ObjectType{
 			AttrTypes: sslForwardProxyObj.AttributeTypes(),
 		},
-		"ssl_inbound_inspection": types.ObjectType{
-			AttrTypes: sslInboundInspectionObj.AttributeTypes(),
+		"ssl_inbound_proxy": types.ObjectType{
+			AttrTypes: sslInboundProxyObj.AttributeTypes(),
 		},
 		"ssl_no_proxy": types.ObjectType{
 			AttrTypes: sslNoProxyObj.AttributeTypes(),
@@ -1712,20 +1754,22 @@ func (o DecryptionProfileResourceSslForwardProxyObject) AncestorName() string {
 func (o DecryptionProfileResourceSslForwardProxyObject) EntryName() *string {
 	return nil
 }
-func (o *DecryptionProfileResourceSslInboundInspectionObject) AttributeTypes() map[string]attr.Type {
+func (o *DecryptionProfileResourceSslInboundProxyObject) AttributeTypes() map[string]attr.Type {
 
 	return map[string]attr.Type{
-		"block_if_no_resource":      types.BoolType,
-		"block_unsupported_cipher":  types.BoolType,
-		"block_unsupported_version": types.BoolType,
+		"block_if_no_resource":              types.BoolType,
+		"block_unsupported_cipher":          types.BoolType,
+		"block_unsupported_version":         types.BoolType,
+		"block_if_hsm_unavailable":          types.BoolType,
+		"block_tls13_downgrade_no_resource": types.BoolType,
 	}
 }
 
-func (o DecryptionProfileResourceSslInboundInspectionObject) AncestorName() string {
-	return "ssl-inbound-inspection"
+func (o DecryptionProfileResourceSslInboundProxyObject) AncestorName() string {
+	return "ssl-inbound-proxy"
 }
 
-func (o DecryptionProfileResourceSslInboundInspectionObject) EntryName() *string {
+func (o DecryptionProfileResourceSslInboundProxyObject) EntryName() *string {
 	return nil
 }
 func (o *DecryptionProfileResourceSslNoProxyObject) AttributeTypes() map[string]attr.Type {
@@ -1792,19 +1836,19 @@ func (o *DecryptionProfileResourceModel) CopyToPango(ctx context.Context, client
 			return diags
 		}
 	}
-	var sslInboundInspection_entry *decryption.SslInboundInspection
-	if !o.SslInboundInspection.IsUnknown() && !o.SslInboundInspection.IsNull() {
-		if *obj != nil && (*obj).SslInboundInspection != nil {
-			sslInboundInspection_entry = (*obj).SslInboundInspection
+	var sslInboundProxy_entry *decryption.SslInboundProxy
+	if !o.SslInboundProxy.IsUnknown() && !o.SslInboundProxy.IsNull() {
+		if *obj != nil && (*obj).SslInboundProxy != nil {
+			sslInboundProxy_entry = (*obj).SslInboundProxy
 		} else {
-			sslInboundInspection_entry = new(decryption.SslInboundInspection)
+			sslInboundProxy_entry = new(decryption.SslInboundProxy)
 		}
-		var object *DecryptionProfileResourceSslInboundInspectionObject
-		diags.Append(o.SslInboundInspection.As(ctx, &object, basetypes.ObjectAsOptions{})...)
+		var object *DecryptionProfileResourceSslInboundProxyObject
+		diags.Append(o.SslInboundProxy.As(ctx, &object, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
 			return diags
 		}
-		diags.Append(object.CopyToPango(ctx, client, ancestors, &sslInboundInspection_entry, ev)...)
+		diags.Append(object.CopyToPango(ctx, client, ancestors, &sslInboundProxy_entry, ev)...)
 		if diags.HasError() {
 			return diags
 		}
@@ -1850,7 +1894,7 @@ func (o *DecryptionProfileResourceModel) CopyToPango(ctx context.Context, client
 	(*obj).Name = o.Name.ValueString()
 	(*obj).Description = description_value
 	(*obj).SslForwardProxy = sslForwardProxy_entry
-	(*obj).SslInboundInspection = sslInboundInspection_entry
+	(*obj).SslInboundProxy = sslInboundProxy_entry
 	(*obj).SslNoProxy = sslNoProxy_entry
 	(*obj).SslProtocolSettings = sslProtocolSettings_entry
 
@@ -1887,18 +1931,22 @@ func (o *DecryptionProfileResourceSslForwardProxyObject) CopyToPango(ctx context
 
 	return diags
 }
-func (o *DecryptionProfileResourceSslInboundInspectionObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **decryption.SslInboundInspection, ev *EncryptedValuesManager) diag.Diagnostics {
+func (o *DecryptionProfileResourceSslInboundProxyObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **decryption.SslInboundProxy, ev *EncryptedValuesManager) diag.Diagnostics {
 	var diags diag.Diagnostics
 	blockIfNoResource_value := o.BlockIfNoResource.ValueBoolPointer()
 	blockUnsupportedCipher_value := o.BlockUnsupportedCipher.ValueBoolPointer()
 	blockUnsupportedVersion_value := o.BlockUnsupportedVersion.ValueBoolPointer()
+	blockIfHsmUnavailable_value := o.BlockIfHsmUnavailable.ValueBoolPointer()
+	blockTls13DowngradeNoResource_value := o.BlockTls13DowngradeNoResource.ValueBoolPointer()
 
 	if (*obj) == nil {
-		*obj = new(decryption.SslInboundInspection)
+		*obj = new(decryption.SslInboundProxy)
 	}
 	(*obj).BlockIfNoResource = blockIfNoResource_value
 	(*obj).BlockUnsupportedCipher = blockUnsupportedCipher_value
 	(*obj).BlockUnsupportedVersion = blockUnsupportedVersion_value
+	(*obj).BlockIfHsmUnavailable = blockIfHsmUnavailable_value
+	(*obj).BlockTls13DowngradeNoResource = blockTls13DowngradeNoResource_value
 
 	return diags
 }
@@ -1981,23 +2029,23 @@ func (o *DecryptionProfileResourceModel) CopyFromPango(ctx context.Context, clie
 		}
 	}
 
-	var sslInboundInspection_obj *DecryptionProfileResourceSslInboundInspectionObject
-	if o.SslInboundInspection.IsNull() {
-		sslInboundInspection_obj = new(DecryptionProfileResourceSslInboundInspectionObject)
+	var sslInboundProxy_obj *DecryptionProfileResourceSslInboundProxyObject
+	if o.SslInboundProxy.IsNull() {
+		sslInboundProxy_obj = new(DecryptionProfileResourceSslInboundProxyObject)
 	} else {
-		diags.Append(o.SslInboundInspection.As(ctx, &sslInboundInspection_obj, basetypes.ObjectAsOptions{})...)
+		diags.Append(o.SslInboundProxy.As(ctx, &sslInboundProxy_obj, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
 			return diags
 		}
 	}
-	sslInboundInspection_object := types.ObjectNull(sslInboundInspection_obj.AttributeTypes())
-	if obj.SslInboundInspection != nil {
-		diags.Append(sslInboundInspection_obj.CopyFromPango(ctx, client, ancestors, obj.SslInboundInspection, ev)...)
+	sslInboundProxy_object := types.ObjectNull(sslInboundProxy_obj.AttributeTypes())
+	if obj.SslInboundProxy != nil {
+		diags.Append(sslInboundProxy_obj.CopyFromPango(ctx, client, ancestors, obj.SslInboundProxy, ev)...)
 		if diags.HasError() {
 			return diags
 		}
 		var diags_tmp diag.Diagnostics
-		sslInboundInspection_object, diags_tmp = types.ObjectValueFrom(ctx, sslInboundInspection_obj.AttributeTypes(), sslInboundInspection_obj)
+		sslInboundProxy_object, diags_tmp = types.ObjectValueFrom(ctx, sslInboundProxy_obj.AttributeTypes(), sslInboundProxy_obj)
 		diags.Append(diags_tmp...)
 		if diags.HasError() {
 			return diags
@@ -2057,7 +2105,7 @@ func (o *DecryptionProfileResourceModel) CopyFromPango(ctx context.Context, clie
 	o.Name = types.StringValue(obj.Name)
 	o.Description = description_value
 	o.SslForwardProxy = sslForwardProxy_object
-	o.SslInboundInspection = sslInboundInspection_object
+	o.SslInboundProxy = sslInboundProxy_object
 	o.SslNoProxy = sslNoProxy_object
 	o.SslProtocolSettings = sslProtocolSettings_object
 
@@ -2126,7 +2174,7 @@ func (o *DecryptionProfileResourceSslForwardProxyObject) CopyFromPango(ctx conte
 	return diags
 }
 
-func (o *DecryptionProfileResourceSslInboundInspectionObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *decryption.SslInboundInspection, ev *EncryptedValuesManager) diag.Diagnostics {
+func (o *DecryptionProfileResourceSslInboundProxyObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *decryption.SslInboundProxy, ev *EncryptedValuesManager) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	var blockIfNoResource_value types.Bool
@@ -2141,9 +2189,19 @@ func (o *DecryptionProfileResourceSslInboundInspectionObject) CopyFromPango(ctx 
 	if obj.BlockUnsupportedVersion != nil {
 		blockUnsupportedVersion_value = types.BoolValue(*obj.BlockUnsupportedVersion)
 	}
+	var blockIfHsmUnavailable_value types.Bool
+	if obj.BlockIfHsmUnavailable != nil {
+		blockIfHsmUnavailable_value = types.BoolValue(*obj.BlockIfHsmUnavailable)
+	}
+	var blockTls13DowngradeNoResource_value types.Bool
+	if obj.BlockTls13DowngradeNoResource != nil {
+		blockTls13DowngradeNoResource_value = types.BoolValue(*obj.BlockTls13DowngradeNoResource)
+	}
 	o.BlockIfNoResource = blockIfNoResource_value
 	o.BlockUnsupportedCipher = blockUnsupportedCipher_value
 	o.BlockUnsupportedVersion = blockUnsupportedVersion_value
+	o.BlockIfHsmUnavailable = blockIfHsmUnavailable_value
+	o.BlockTls13DowngradeNoResource = blockTls13DowngradeNoResource_value
 
 	return diags
 }

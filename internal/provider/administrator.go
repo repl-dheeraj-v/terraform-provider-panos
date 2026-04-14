@@ -60,31 +60,21 @@ type AdministratorDataSourceModel struct {
 	AuthenticationProfile types.String `tfsdk:"authentication_profile"`
 	PublicKey             types.String `tfsdk:"public_key"`
 	Password              types.String `tfsdk:"password"`
-	Disabled              types.Bool   `tfsdk:"disabled"`
-	Role                  types.Object `tfsdk:"role"`
+	Permissions           types.Object `tfsdk:"permissions"`
 }
-type AdministratorDataSourceRoleObject struct {
-	Superuser    types.Object `tfsdk:"superuser"`
-	Superreader  types.Object `tfsdk:"superreader"`
-	Deviceadmin  types.Object `tfsdk:"deviceadmin"`
-	Devicereader types.Object `tfsdk:"devicereader"`
-	Vsysadmin    types.Object `tfsdk:"vsysadmin"`
-	Vsysreader   types.Object `tfsdk:"vsysreader"`
+type AdministratorDataSourcePermissionsObject struct {
+	RoleBased types.Object `tfsdk:"role_based"`
+}
+type AdministratorDataSourcePermissionsRoleBasedObject struct {
+	Superuser    types.Bool   `tfsdk:"superuser"`
+	Superreader  types.Bool   `tfsdk:"superreader"`
+	Deviceadmin  types.Bool   `tfsdk:"deviceadmin"`
+	Devicereader types.Bool   `tfsdk:"devicereader"`
+	Vsysadmin    types.Bool   `tfsdk:"vsysadmin"`
+	Vsysreader   types.Bool   `tfsdk:"vsysreader"`
 	Custom       types.Object `tfsdk:"custom"`
 }
-type AdministratorDataSourceRoleSuperuserObject struct {
-}
-type AdministratorDataSourceRoleSuperreaderObject struct {
-}
-type AdministratorDataSourceRoleDeviceadminObject struct {
-}
-type AdministratorDataSourceRoleDevicereaderObject struct {
-}
-type AdministratorDataSourceRoleVsysadminObject struct {
-}
-type AdministratorDataSourceRoleVsysreaderObject struct {
-}
-type AdministratorDataSourceRoleCustomObject struct {
+type AdministratorDataSourcePermissionsRoleBasedCustomObject struct {
 	Profile types.String `tfsdk:"profile"`
 }
 
@@ -92,7 +82,7 @@ func (o *AdministratorDataSourceModel) AttributeTypes() map[string]attr.Type {
 
 	var locationObj AdministratorLocation
 
-	var roleObj *AdministratorDataSourceRoleObject
+	var permissionsObj *AdministratorDataSourcePermissionsObject
 	return map[string]attr.Type{
 		"location": types.ObjectType{
 			AttrTypes: locationObj.AttributeTypes(),
@@ -101,9 +91,8 @@ func (o *AdministratorDataSourceModel) AttributeTypes() map[string]attr.Type {
 		"authentication_profile": types.StringType,
 		"public_key":             types.StringType,
 		"password":               types.StringType,
-		"disabled":               types.BoolType,
-		"role": types.ObjectType{
-			AttrTypes: roleObj.AttributeTypes(),
+		"permissions": types.ObjectType{
+			AttrTypes: permissionsObj.AttributeTypes(),
 		},
 	}
 }
@@ -115,131 +104,58 @@ func (o AdministratorDataSourceModel) AncestorName() string {
 func (o AdministratorDataSourceModel) EntryName() *string {
 	return nil
 }
-func (o *AdministratorDataSourceRoleObject) AttributeTypes() map[string]attr.Type {
+func (o *AdministratorDataSourcePermissionsObject) AttributeTypes() map[string]attr.Type {
 
-	var superuserObj *AdministratorDataSourceRoleSuperuserObject
-
-	var superreaderObj *AdministratorDataSourceRoleSuperreaderObject
-
-	var deviceadminObj *AdministratorDataSourceRoleDeviceadminObject
-
-	var devicereaderObj *AdministratorDataSourceRoleDevicereaderObject
-
-	var vsysadminObj *AdministratorDataSourceRoleVsysadminObject
-
-	var vsysreaderObj *AdministratorDataSourceRoleVsysreaderObject
-
-	var customObj *AdministratorDataSourceRoleCustomObject
+	var roleBasedObj *AdministratorDataSourcePermissionsRoleBasedObject
 	return map[string]attr.Type{
-		"superuser": types.ObjectType{
-			AttrTypes: superuserObj.AttributeTypes(),
+		"role_based": types.ObjectType{
+			AttrTypes: roleBasedObj.AttributeTypes(),
 		},
-		"superreader": types.ObjectType{
-			AttrTypes: superreaderObj.AttributeTypes(),
-		},
-		"deviceadmin": types.ObjectType{
-			AttrTypes: deviceadminObj.AttributeTypes(),
-		},
-		"devicereader": types.ObjectType{
-			AttrTypes: devicereaderObj.AttributeTypes(),
-		},
-		"vsysadmin": types.ObjectType{
-			AttrTypes: vsysadminObj.AttributeTypes(),
-		},
-		"vsysreader": types.ObjectType{
-			AttrTypes: vsysreaderObj.AttributeTypes(),
-		},
+	}
+}
+
+func (o AdministratorDataSourcePermissionsObject) AncestorName() string {
+	return "permissions"
+}
+
+func (o AdministratorDataSourcePermissionsObject) EntryName() *string {
+	return nil
+}
+func (o *AdministratorDataSourcePermissionsRoleBasedObject) AttributeTypes() map[string]attr.Type {
+
+	var customObj *AdministratorDataSourcePermissionsRoleBasedCustomObject
+	return map[string]attr.Type{
+		"superuser":    types.BoolType,
+		"superreader":  types.BoolType,
+		"deviceadmin":  types.BoolType,
+		"devicereader": types.BoolType,
+		"vsysadmin":    types.BoolType,
+		"vsysreader":   types.BoolType,
 		"custom": types.ObjectType{
 			AttrTypes: customObj.AttributeTypes(),
 		},
 	}
 }
 
-func (o AdministratorDataSourceRoleObject) AncestorName() string {
-	return "role"
+func (o AdministratorDataSourcePermissionsRoleBasedObject) AncestorName() string {
+	return "role-based"
 }
 
-func (o AdministratorDataSourceRoleObject) EntryName() *string {
+func (o AdministratorDataSourcePermissionsRoleBasedObject) EntryName() *string {
 	return nil
 }
-func (o *AdministratorDataSourceRoleSuperuserObject) AttributeTypes() map[string]attr.Type {
-	return map[string]attr.Type{}
-}
-
-func (o AdministratorDataSourceRoleSuperuserObject) AncestorName() string {
-	return "superuser"
-}
-
-func (o AdministratorDataSourceRoleSuperuserObject) EntryName() *string {
-	return nil
-}
-func (o *AdministratorDataSourceRoleSuperreaderObject) AttributeTypes() map[string]attr.Type {
-	return map[string]attr.Type{}
-}
-
-func (o AdministratorDataSourceRoleSuperreaderObject) AncestorName() string {
-	return "superreader"
-}
-
-func (o AdministratorDataSourceRoleSuperreaderObject) EntryName() *string {
-	return nil
-}
-func (o *AdministratorDataSourceRoleDeviceadminObject) AttributeTypes() map[string]attr.Type {
-	return map[string]attr.Type{}
-}
-
-func (o AdministratorDataSourceRoleDeviceadminObject) AncestorName() string {
-	return "deviceadmin"
-}
-
-func (o AdministratorDataSourceRoleDeviceadminObject) EntryName() *string {
-	return nil
-}
-func (o *AdministratorDataSourceRoleDevicereaderObject) AttributeTypes() map[string]attr.Type {
-	return map[string]attr.Type{}
-}
-
-func (o AdministratorDataSourceRoleDevicereaderObject) AncestorName() string {
-	return "devicereader"
-}
-
-func (o AdministratorDataSourceRoleDevicereaderObject) EntryName() *string {
-	return nil
-}
-func (o *AdministratorDataSourceRoleVsysadminObject) AttributeTypes() map[string]attr.Type {
-	return map[string]attr.Type{}
-}
-
-func (o AdministratorDataSourceRoleVsysadminObject) AncestorName() string {
-	return "vsysadmin"
-}
-
-func (o AdministratorDataSourceRoleVsysadminObject) EntryName() *string {
-	return nil
-}
-func (o *AdministratorDataSourceRoleVsysreaderObject) AttributeTypes() map[string]attr.Type {
-	return map[string]attr.Type{}
-}
-
-func (o AdministratorDataSourceRoleVsysreaderObject) AncestorName() string {
-	return "vsysreader"
-}
-
-func (o AdministratorDataSourceRoleVsysreaderObject) EntryName() *string {
-	return nil
-}
-func (o *AdministratorDataSourceRoleCustomObject) AttributeTypes() map[string]attr.Type {
+func (o *AdministratorDataSourcePermissionsRoleBasedCustomObject) AttributeTypes() map[string]attr.Type {
 
 	return map[string]attr.Type{
 		"profile": types.StringType,
 	}
 }
 
-func (o AdministratorDataSourceRoleCustomObject) AncestorName() string {
+func (o AdministratorDataSourcePermissionsRoleBasedCustomObject) AncestorName() string {
 	return "custom"
 }
 
-func (o AdministratorDataSourceRoleCustomObject) EntryName() *string {
+func (o AdministratorDataSourcePermissionsRoleBasedCustomObject) EntryName() *string {
 	return nil
 }
 
@@ -262,20 +178,19 @@ func (o *AdministratorDataSourceModel) CopyToPango(ctx context.Context, client p
 		}
 		password_value = o.Password.ValueStringPointer()
 	}
-	disabled_value := o.Disabled.ValueBoolPointer()
-	var role_entry *administrator.Role
-	if !o.Role.IsUnknown() && !o.Role.IsNull() {
-		if *obj != nil && (*obj).Role != nil {
-			role_entry = (*obj).Role
+	var permissions_entry *administrator.Permissions
+	if !o.Permissions.IsUnknown() && !o.Permissions.IsNull() {
+		if *obj != nil && (*obj).Permissions != nil {
+			permissions_entry = (*obj).Permissions
 		} else {
-			role_entry = new(administrator.Role)
+			permissions_entry = new(administrator.Permissions)
 		}
-		var object *AdministratorDataSourceRoleObject
-		diags.Append(o.Role.As(ctx, &object, basetypes.ObjectAsOptions{})...)
+		var object *AdministratorDataSourcePermissionsObject
+		diags.Append(o.Permissions.As(ctx, &object, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
 			return diags
 		}
-		diags.Append(object.CopyToPango(ctx, client, ancestors, &role_entry, ev)...)
+		diags.Append(object.CopyToPango(ctx, client, ancestors, &permissions_entry, ev)...)
 		if diags.HasError() {
 			return diags
 		}
@@ -288,123 +203,53 @@ func (o *AdministratorDataSourceModel) CopyToPango(ctx context.Context, client p
 	(*obj).AuthenticationProfile = authenticationProfile_value
 	(*obj).PublicKey = publicKey_value
 	(*obj).Phash = password_value
-	(*obj).Disabled = disabled_value
-	(*obj).Role = role_entry
+	(*obj).Permissions = permissions_entry
 
 	return diags
 }
-func (o *AdministratorDataSourceRoleObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.Role, ev *EncryptedValuesManager) diag.Diagnostics {
+func (o *AdministratorDataSourcePermissionsObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.Permissions, ev *EncryptedValuesManager) diag.Diagnostics {
 	var diags diag.Diagnostics
-	var superuser_entry *administrator.RoleSuperuser
-	if !o.Superuser.IsUnknown() && !o.Superuser.IsNull() {
-		if *obj != nil && (*obj).Superuser != nil {
-			superuser_entry = (*obj).Superuser
+	var roleBased_entry *administrator.PermissionsRoleBased
+	if !o.RoleBased.IsUnknown() && !o.RoleBased.IsNull() {
+		if *obj != nil && (*obj).RoleBased != nil {
+			roleBased_entry = (*obj).RoleBased
 		} else {
-			superuser_entry = new(administrator.RoleSuperuser)
+			roleBased_entry = new(administrator.PermissionsRoleBased)
 		}
-		var object *AdministratorDataSourceRoleSuperuserObject
-		diags.Append(o.Superuser.As(ctx, &object, basetypes.ObjectAsOptions{})...)
+		var object *AdministratorDataSourcePermissionsRoleBasedObject
+		diags.Append(o.RoleBased.As(ctx, &object, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
 			return diags
 		}
-		diags.Append(object.CopyToPango(ctx, client, append(ancestors, o), &superuser_entry, ev)...)
+		diags.Append(object.CopyToPango(ctx, client, append(ancestors, o), &roleBased_entry, ev)...)
 		if diags.HasError() {
 			return diags
 		}
 	}
-	var superreader_entry *administrator.RoleSuperreader
-	if !o.Superreader.IsUnknown() && !o.Superreader.IsNull() {
-		if *obj != nil && (*obj).Superreader != nil {
-			superreader_entry = (*obj).Superreader
-		} else {
-			superreader_entry = new(administrator.RoleSuperreader)
-		}
-		var object *AdministratorDataSourceRoleSuperreaderObject
-		diags.Append(o.Superreader.As(ctx, &object, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-		diags.Append(object.CopyToPango(ctx, client, append(ancestors, o), &superreader_entry, ev)...)
-		if diags.HasError() {
-			return diags
-		}
+
+	if (*obj) == nil {
+		*obj = new(administrator.Permissions)
 	}
-	var deviceadmin_entry *administrator.RoleDeviceadmin
-	if !o.Deviceadmin.IsUnknown() && !o.Deviceadmin.IsNull() {
-		if *obj != nil && (*obj).Deviceadmin != nil {
-			deviceadmin_entry = (*obj).Deviceadmin
-		} else {
-			deviceadmin_entry = new(administrator.RoleDeviceadmin)
-		}
-		var object *AdministratorDataSourceRoleDeviceadminObject
-		diags.Append(o.Deviceadmin.As(ctx, &object, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-		diags.Append(object.CopyToPango(ctx, client, append(ancestors, o), &deviceadmin_entry, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	var devicereader_entry *administrator.RoleDevicereader
-	if !o.Devicereader.IsUnknown() && !o.Devicereader.IsNull() {
-		if *obj != nil && (*obj).Devicereader != nil {
-			devicereader_entry = (*obj).Devicereader
-		} else {
-			devicereader_entry = new(administrator.RoleDevicereader)
-		}
-		var object *AdministratorDataSourceRoleDevicereaderObject
-		diags.Append(o.Devicereader.As(ctx, &object, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-		diags.Append(object.CopyToPango(ctx, client, append(ancestors, o), &devicereader_entry, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	var vsysadmin_entry *administrator.RoleVsysadmin
-	if !o.Vsysadmin.IsUnknown() && !o.Vsysadmin.IsNull() {
-		if *obj != nil && (*obj).Vsysadmin != nil {
-			vsysadmin_entry = (*obj).Vsysadmin
-		} else {
-			vsysadmin_entry = new(administrator.RoleVsysadmin)
-		}
-		var object *AdministratorDataSourceRoleVsysadminObject
-		diags.Append(o.Vsysadmin.As(ctx, &object, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-		diags.Append(object.CopyToPango(ctx, client, append(ancestors, o), &vsysadmin_entry, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	var vsysreader_entry *administrator.RoleVsysreader
-	if !o.Vsysreader.IsUnknown() && !o.Vsysreader.IsNull() {
-		if *obj != nil && (*obj).Vsysreader != nil {
-			vsysreader_entry = (*obj).Vsysreader
-		} else {
-			vsysreader_entry = new(administrator.RoleVsysreader)
-		}
-		var object *AdministratorDataSourceRoleVsysreaderObject
-		diags.Append(o.Vsysreader.As(ctx, &object, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-		diags.Append(object.CopyToPango(ctx, client, append(ancestors, o), &vsysreader_entry, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	var custom_entry *administrator.RoleCustom
+	(*obj).RoleBased = roleBased_entry
+
+	return diags
+}
+func (o *AdministratorDataSourcePermissionsRoleBasedObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.PermissionsRoleBased, ev *EncryptedValuesManager) diag.Diagnostics {
+	var diags diag.Diagnostics
+	superuser_value := o.Superuser.ValueBoolPointer()
+	superreader_value := o.Superreader.ValueBoolPointer()
+	deviceadmin_value := o.Deviceadmin.ValueBoolPointer()
+	devicereader_value := o.Devicereader.ValueBoolPointer()
+	vsysadmin_value := o.Vsysadmin.ValueBoolPointer()
+	vsysreader_value := o.Vsysreader.ValueBoolPointer()
+	var custom_entry *administrator.PermissionsRoleBasedCustom
 	if !o.Custom.IsUnknown() && !o.Custom.IsNull() {
 		if *obj != nil && (*obj).Custom != nil {
 			custom_entry = (*obj).Custom
 		} else {
-			custom_entry = new(administrator.RoleCustom)
+			custom_entry = new(administrator.PermissionsRoleBasedCustom)
 		}
-		var object *AdministratorDataSourceRoleCustomObject
+		var object *AdministratorDataSourcePermissionsRoleBasedCustomObject
 		diags.Append(o.Custom.As(ctx, &object, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
 			return diags
@@ -416,78 +261,24 @@ func (o *AdministratorDataSourceRoleObject) CopyToPango(ctx context.Context, cli
 	}
 
 	if (*obj) == nil {
-		*obj = new(administrator.Role)
+		*obj = new(administrator.PermissionsRoleBased)
 	}
-	(*obj).Superuser = superuser_entry
-	(*obj).Superreader = superreader_entry
-	(*obj).Deviceadmin = deviceadmin_entry
-	(*obj).Devicereader = devicereader_entry
-	(*obj).Vsysadmin = vsysadmin_entry
-	(*obj).Vsysreader = vsysreader_entry
+	(*obj).Superuser = superuser_value
+	(*obj).Superreader = superreader_value
+	(*obj).Deviceadmin = deviceadmin_value
+	(*obj).Devicereader = devicereader_value
+	(*obj).Vsysadmin = vsysadmin_value
+	(*obj).Vsysreader = vsysreader_value
 	(*obj).Custom = custom_entry
 
 	return diags
 }
-func (o *AdministratorDataSourceRoleSuperuserObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.RoleSuperuser, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if (*obj) == nil {
-		*obj = new(administrator.RoleSuperuser)
-	}
-
-	return diags
-}
-func (o *AdministratorDataSourceRoleSuperreaderObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.RoleSuperreader, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if (*obj) == nil {
-		*obj = new(administrator.RoleSuperreader)
-	}
-
-	return diags
-}
-func (o *AdministratorDataSourceRoleDeviceadminObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.RoleDeviceadmin, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if (*obj) == nil {
-		*obj = new(administrator.RoleDeviceadmin)
-	}
-
-	return diags
-}
-func (o *AdministratorDataSourceRoleDevicereaderObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.RoleDevicereader, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if (*obj) == nil {
-		*obj = new(administrator.RoleDevicereader)
-	}
-
-	return diags
-}
-func (o *AdministratorDataSourceRoleVsysadminObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.RoleVsysadmin, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if (*obj) == nil {
-		*obj = new(administrator.RoleVsysadmin)
-	}
-
-	return diags
-}
-func (o *AdministratorDataSourceRoleVsysreaderObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.RoleVsysreader, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if (*obj) == nil {
-		*obj = new(administrator.RoleVsysreader)
-	}
-
-	return diags
-}
-func (o *AdministratorDataSourceRoleCustomObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.RoleCustom, ev *EncryptedValuesManager) diag.Diagnostics {
+func (o *AdministratorDataSourcePermissionsRoleBasedCustomObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.PermissionsRoleBasedCustom, ev *EncryptedValuesManager) diag.Diagnostics {
 	var diags diag.Diagnostics
 	profile_value := o.Profile.ValueStringPointer()
 
 	if (*obj) == nil {
-		*obj = new(administrator.RoleCustom)
+		*obj = new(administrator.PermissionsRoleBasedCustom)
 	}
 	(*obj).Profile = profile_value
 
@@ -497,23 +288,23 @@ func (o *AdministratorDataSourceRoleCustomObject) CopyToPango(ctx context.Contex
 func (o *AdministratorDataSourceModel) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.Entry, ev *EncryptedValuesManager) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	var role_obj *AdministratorDataSourceRoleObject
-	if o.Role.IsNull() {
-		role_obj = new(AdministratorDataSourceRoleObject)
+	var permissions_obj *AdministratorDataSourcePermissionsObject
+	if o.Permissions.IsNull() {
+		permissions_obj = new(AdministratorDataSourcePermissionsObject)
 	} else {
-		diags.Append(o.Role.As(ctx, &role_obj, basetypes.ObjectAsOptions{})...)
+		diags.Append(o.Permissions.As(ctx, &permissions_obj, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
 			return diags
 		}
 	}
-	role_object := types.ObjectNull(role_obj.AttributeTypes())
-	if obj.Role != nil {
-		diags.Append(role_obj.CopyFromPango(ctx, client, ancestors, obj.Role, ev)...)
+	permissions_object := types.ObjectNull(permissions_obj.AttributeTypes())
+	if obj.Permissions != nil {
+		diags.Append(permissions_obj.CopyFromPango(ctx, client, ancestors, obj.Permissions, ev)...)
 		if diags.HasError() {
 			return diags
 		}
 		var diags_tmp diag.Diagnostics
-		role_object, diags_tmp = types.ObjectValueFrom(ctx, role_obj.AttributeTypes(), role_obj)
+		permissions_object, diags_tmp = types.ObjectValueFrom(ctx, permissions_obj.AttributeTypes(), permissions_obj)
 		diags.Append(diags_tmp...)
 		if diags.HasError() {
 			return diags
@@ -553,164 +344,52 @@ func (o *AdministratorDataSourceModel) CopyFromPango(ctx context.Context, client
 			}
 		}
 	}
-	var disabled_value types.Bool
-	if obj.Disabled != nil {
-		disabled_value = types.BoolValue(*obj.Disabled)
-	}
 	o.Name = types.StringValue(obj.Name)
 	o.AuthenticationProfile = authenticationProfile_value
 	o.PublicKey = publicKey_value
 	o.Password = password_value
-	o.Disabled = disabled_value
-	o.Role = role_object
+	o.Permissions = permissions_object
 
 	return diags
 }
 
-func (o *AdministratorDataSourceRoleObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.Role, ev *EncryptedValuesManager) diag.Diagnostics {
+func (o *AdministratorDataSourcePermissionsObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.Permissions, ev *EncryptedValuesManager) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	var superuser_obj *AdministratorDataSourceRoleSuperuserObject
-	if o.Superuser.IsNull() {
-		superuser_obj = new(AdministratorDataSourceRoleSuperuserObject)
+	var roleBased_obj *AdministratorDataSourcePermissionsRoleBasedObject
+	if o.RoleBased.IsNull() {
+		roleBased_obj = new(AdministratorDataSourcePermissionsRoleBasedObject)
 	} else {
-		diags.Append(o.Superuser.As(ctx, &superuser_obj, basetypes.ObjectAsOptions{})...)
+		diags.Append(o.RoleBased.As(ctx, &roleBased_obj, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
 			return diags
 		}
 	}
-	superuser_object := types.ObjectNull(superuser_obj.AttributeTypes())
-	if obj.Superuser != nil {
-		diags.Append(superuser_obj.CopyFromPango(ctx, client, append(ancestors, o), obj.Superuser, ev)...)
+	roleBased_object := types.ObjectNull(roleBased_obj.AttributeTypes())
+	if obj.RoleBased != nil {
+		diags.Append(roleBased_obj.CopyFromPango(ctx, client, append(ancestors, o), obj.RoleBased, ev)...)
 		if diags.HasError() {
 			return diags
 		}
 		var diags_tmp diag.Diagnostics
-		superuser_object, diags_tmp = types.ObjectValueFrom(ctx, superuser_obj.AttributeTypes(), superuser_obj)
+		roleBased_object, diags_tmp = types.ObjectValueFrom(ctx, roleBased_obj.AttributeTypes(), roleBased_obj)
 		diags.Append(diags_tmp...)
 		if diags.HasError() {
 			return diags
 		}
 	}
 
-	var superreader_obj *AdministratorDataSourceRoleSuperreaderObject
-	if o.Superreader.IsNull() {
-		superreader_obj = new(AdministratorDataSourceRoleSuperreaderObject)
-	} else {
-		diags.Append(o.Superreader.As(ctx, &superreader_obj, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	superreader_object := types.ObjectNull(superreader_obj.AttributeTypes())
-	if obj.Superreader != nil {
-		diags.Append(superreader_obj.CopyFromPango(ctx, client, append(ancestors, o), obj.Superreader, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-		var diags_tmp diag.Diagnostics
-		superreader_object, diags_tmp = types.ObjectValueFrom(ctx, superreader_obj.AttributeTypes(), superreader_obj)
-		diags.Append(diags_tmp...)
-		if diags.HasError() {
-			return diags
-		}
-	}
+	o.RoleBased = roleBased_object
 
-	var deviceadmin_obj *AdministratorDataSourceRoleDeviceadminObject
-	if o.Deviceadmin.IsNull() {
-		deviceadmin_obj = new(AdministratorDataSourceRoleDeviceadminObject)
-	} else {
-		diags.Append(o.Deviceadmin.As(ctx, &deviceadmin_obj, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	deviceadmin_object := types.ObjectNull(deviceadmin_obj.AttributeTypes())
-	if obj.Deviceadmin != nil {
-		diags.Append(deviceadmin_obj.CopyFromPango(ctx, client, append(ancestors, o), obj.Deviceadmin, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-		var diags_tmp diag.Diagnostics
-		deviceadmin_object, diags_tmp = types.ObjectValueFrom(ctx, deviceadmin_obj.AttributeTypes(), deviceadmin_obj)
-		diags.Append(diags_tmp...)
-		if diags.HasError() {
-			return diags
-		}
-	}
+	return diags
+}
 
-	var devicereader_obj *AdministratorDataSourceRoleDevicereaderObject
-	if o.Devicereader.IsNull() {
-		devicereader_obj = new(AdministratorDataSourceRoleDevicereaderObject)
-	} else {
-		diags.Append(o.Devicereader.As(ctx, &devicereader_obj, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	devicereader_object := types.ObjectNull(devicereader_obj.AttributeTypes())
-	if obj.Devicereader != nil {
-		diags.Append(devicereader_obj.CopyFromPango(ctx, client, append(ancestors, o), obj.Devicereader, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-		var diags_tmp diag.Diagnostics
-		devicereader_object, diags_tmp = types.ObjectValueFrom(ctx, devicereader_obj.AttributeTypes(), devicereader_obj)
-		diags.Append(diags_tmp...)
-		if diags.HasError() {
-			return diags
-		}
-	}
+func (o *AdministratorDataSourcePermissionsRoleBasedObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.PermissionsRoleBased, ev *EncryptedValuesManager) diag.Diagnostics {
+	var diags diag.Diagnostics
 
-	var vsysadmin_obj *AdministratorDataSourceRoleVsysadminObject
-	if o.Vsysadmin.IsNull() {
-		vsysadmin_obj = new(AdministratorDataSourceRoleVsysadminObject)
-	} else {
-		diags.Append(o.Vsysadmin.As(ctx, &vsysadmin_obj, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	vsysadmin_object := types.ObjectNull(vsysadmin_obj.AttributeTypes())
-	if obj.Vsysadmin != nil {
-		diags.Append(vsysadmin_obj.CopyFromPango(ctx, client, append(ancestors, o), obj.Vsysadmin, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-		var diags_tmp diag.Diagnostics
-		vsysadmin_object, diags_tmp = types.ObjectValueFrom(ctx, vsysadmin_obj.AttributeTypes(), vsysadmin_obj)
-		diags.Append(diags_tmp...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-
-	var vsysreader_obj *AdministratorDataSourceRoleVsysreaderObject
-	if o.Vsysreader.IsNull() {
-		vsysreader_obj = new(AdministratorDataSourceRoleVsysreaderObject)
-	} else {
-		diags.Append(o.Vsysreader.As(ctx, &vsysreader_obj, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	vsysreader_object := types.ObjectNull(vsysreader_obj.AttributeTypes())
-	if obj.Vsysreader != nil {
-		diags.Append(vsysreader_obj.CopyFromPango(ctx, client, append(ancestors, o), obj.Vsysreader, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-		var diags_tmp diag.Diagnostics
-		vsysreader_object, diags_tmp = types.ObjectValueFrom(ctx, vsysreader_obj.AttributeTypes(), vsysreader_obj)
-		diags.Append(diags_tmp...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-
-	var custom_obj *AdministratorDataSourceRoleCustomObject
+	var custom_obj *AdministratorDataSourcePermissionsRoleBasedCustomObject
 	if o.Custom.IsNull() {
-		custom_obj = new(AdministratorDataSourceRoleCustomObject)
+		custom_obj = new(AdministratorDataSourcePermissionsRoleBasedCustomObject)
 	} else {
 		diags.Append(o.Custom.As(ctx, &custom_obj, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
@@ -731,54 +410,42 @@ func (o *AdministratorDataSourceRoleObject) CopyFromPango(ctx context.Context, c
 		}
 	}
 
-	o.Superuser = superuser_object
-	o.Superreader = superreader_object
-	o.Deviceadmin = deviceadmin_object
-	o.Devicereader = devicereader_object
-	o.Vsysadmin = vsysadmin_object
-	o.Vsysreader = vsysreader_object
+	var superuser_value types.Bool
+	if obj.Superuser != nil {
+		superuser_value = types.BoolValue(*obj.Superuser)
+	}
+	var superreader_value types.Bool
+	if obj.Superreader != nil {
+		superreader_value = types.BoolValue(*obj.Superreader)
+	}
+	var deviceadmin_value types.Bool
+	if obj.Deviceadmin != nil {
+		deviceadmin_value = types.BoolValue(*obj.Deviceadmin)
+	}
+	var devicereader_value types.Bool
+	if obj.Devicereader != nil {
+		devicereader_value = types.BoolValue(*obj.Devicereader)
+	}
+	var vsysadmin_value types.Bool
+	if obj.Vsysadmin != nil {
+		vsysadmin_value = types.BoolValue(*obj.Vsysadmin)
+	}
+	var vsysreader_value types.Bool
+	if obj.Vsysreader != nil {
+		vsysreader_value = types.BoolValue(*obj.Vsysreader)
+	}
+	o.Superuser = superuser_value
+	o.Superreader = superreader_value
+	o.Deviceadmin = deviceadmin_value
+	o.Devicereader = devicereader_value
+	o.Vsysadmin = vsysadmin_value
+	o.Vsysreader = vsysreader_value
 	o.Custom = custom_object
 
 	return diags
 }
 
-func (o *AdministratorDataSourceRoleSuperuserObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.RoleSuperuser, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	return diags
-}
-
-func (o *AdministratorDataSourceRoleSuperreaderObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.RoleSuperreader, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	return diags
-}
-
-func (o *AdministratorDataSourceRoleDeviceadminObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.RoleDeviceadmin, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	return diags
-}
-
-func (o *AdministratorDataSourceRoleDevicereaderObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.RoleDevicereader, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	return diags
-}
-
-func (o *AdministratorDataSourceRoleVsysadminObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.RoleVsysadmin, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	return diags
-}
-
-func (o *AdministratorDataSourceRoleVsysreaderObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.RoleVsysreader, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	return diags
-}
-
-func (o *AdministratorDataSourceRoleCustomObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.RoleCustom, ev *EncryptedValuesManager) diag.Diagnostics {
+func (o *AdministratorDataSourcePermissionsRoleBasedCustomObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.PermissionsRoleBasedCustom, ev *EncryptedValuesManager) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	var profile_value types.String
@@ -825,13 +492,7 @@ func AdministratorDataSourceSchema() dsschema.Schema {
 				Sensitive:   true,
 			},
 
-			"disabled": dsschema.BoolAttribute{
-				Description: "Disable this administrator account",
-				Optional:    true,
-				Computed:    true,
-			},
-
-			"role": AdministratorDataSourceRoleSchema(),
+			"permissions": AdministratorDataSourcePermissionsSchema(),
 		},
 	}
 }
@@ -854,32 +515,20 @@ func (o *AdministratorDataSourceModel) getTypeFor(name string) attr.Type {
 	panic("unreachable")
 }
 
-func AdministratorDataSourceRoleSchema() dsschema.SingleNestedAttribute {
+func AdministratorDataSourcePermissionsSchema() dsschema.SingleNestedAttribute {
 	return dsschema.SingleNestedAttribute{
 		Description: "",
 		Optional:    true,
 		Computed:    true,
 		Attributes: map[string]dsschema.Attribute{
 
-			"superuser": AdministratorDataSourceRoleSuperuserSchema(),
-
-			"superreader": AdministratorDataSourceRoleSuperreaderSchema(),
-
-			"deviceadmin": AdministratorDataSourceRoleDeviceadminSchema(),
-
-			"devicereader": AdministratorDataSourceRoleDevicereaderSchema(),
-
-			"vsysadmin": AdministratorDataSourceRoleVsysadminSchema(),
-
-			"vsysreader": AdministratorDataSourceRoleVsysreaderSchema(),
-
-			"custom": AdministratorDataSourceRoleCustomSchema(),
+			"role_based": AdministratorDataSourcePermissionsRoleBasedSchema(),
 		},
 	}
 }
 
-func (o *AdministratorDataSourceRoleObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorDataSourceRoleSchema()
+func (o *AdministratorDataSourcePermissionsObject) getTypeFor(name string) attr.Type {
+	schema := AdministratorDataSourcePermissionsSchema()
 	if attr, ok := schema.Attributes[name]; !ok {
 		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
 	} else {
@@ -896,29 +545,56 @@ func (o *AdministratorDataSourceRoleObject) getTypeFor(name string) attr.Type {
 	panic("unreachable")
 }
 
-func AdministratorDataSourceRoleSuperuserSchema() dsschema.SingleNestedAttribute {
+func AdministratorDataSourcePermissionsRoleBasedSchema() dsschema.SingleNestedAttribute {
 	return dsschema.SingleNestedAttribute{
 		Description: "",
 		Optional:    true,
 		Computed:    true,
+		Attributes: map[string]dsschema.Attribute{
 
-		Validators: []validator.Object{
-			objectvalidator.ExactlyOneOf(path.Expressions{
-				path.MatchRelative().AtParent().AtName("superuser"),
-				path.MatchRelative().AtParent().AtName("superreader"),
-				path.MatchRelative().AtParent().AtName("deviceadmin"),
-				path.MatchRelative().AtParent().AtName("devicereader"),
-				path.MatchRelative().AtParent().AtName("vsysadmin"),
-				path.MatchRelative().AtParent().AtName("vsysreader"),
-				path.MatchRelative().AtParent().AtName("custom"),
-			}...),
+			"superuser": dsschema.BoolAttribute{
+				Description: "Full system access",
+				Optional:    true,
+				Computed:    true,
+			},
+
+			"superreader": dsschema.BoolAttribute{
+				Description: "Read-only access to entire system",
+				Optional:    true,
+				Computed:    true,
+			},
+
+			"deviceadmin": dsschema.BoolAttribute{
+				Description: "Device administrator access (all vsys)",
+				Optional:    true,
+				Computed:    true,
+			},
+
+			"devicereader": dsschema.BoolAttribute{
+				Description: "Device read-only access (all vsys)",
+				Optional:    true,
+				Computed:    true,
+			},
+
+			"vsysadmin": dsschema.BoolAttribute{
+				Description: "Virtual system administrator access",
+				Optional:    true,
+				Computed:    true,
+			},
+
+			"vsysreader": dsschema.BoolAttribute{
+				Description: "Virtual system read-only access",
+				Optional:    true,
+				Computed:    true,
+			},
+
+			"custom": AdministratorDataSourcePermissionsRoleBasedCustomSchema(),
 		},
-		Attributes: map[string]dsschema.Attribute{},
 	}
 }
 
-func (o *AdministratorDataSourceRoleSuperuserObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorDataSourceRoleSuperuserSchema()
+func (o *AdministratorDataSourcePermissionsRoleBasedObject) getTypeFor(name string) attr.Type {
+	schema := AdministratorDataSourcePermissionsRoleBasedSchema()
 	if attr, ok := schema.Attributes[name]; !ok {
 		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
 	} else {
@@ -935,218 +611,11 @@ func (o *AdministratorDataSourceRoleSuperuserObject) getTypeFor(name string) att
 	panic("unreachable")
 }
 
-func AdministratorDataSourceRoleSuperreaderSchema() dsschema.SingleNestedAttribute {
+func AdministratorDataSourcePermissionsRoleBasedCustomSchema() dsschema.SingleNestedAttribute {
 	return dsschema.SingleNestedAttribute{
 		Description: "",
 		Optional:    true,
 		Computed:    true,
-
-		Validators: []validator.Object{
-			objectvalidator.ExactlyOneOf(path.Expressions{
-				path.MatchRelative().AtParent().AtName("superuser"),
-				path.MatchRelative().AtParent().AtName("superreader"),
-				path.MatchRelative().AtParent().AtName("deviceadmin"),
-				path.MatchRelative().AtParent().AtName("devicereader"),
-				path.MatchRelative().AtParent().AtName("vsysadmin"),
-				path.MatchRelative().AtParent().AtName("vsysreader"),
-				path.MatchRelative().AtParent().AtName("custom"),
-			}...),
-		},
-		Attributes: map[string]dsschema.Attribute{},
-	}
-}
-
-func (o *AdministratorDataSourceRoleSuperreaderObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorDataSourceRoleSuperreaderSchema()
-	if attr, ok := schema.Attributes[name]; !ok {
-		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
-	} else {
-		switch attr := attr.(type) {
-		case dsschema.ListNestedAttribute:
-			return attr.NestedObject.Type()
-		case dsschema.MapNestedAttribute:
-			return attr.NestedObject.Type()
-		default:
-			return attr.GetType()
-		}
-	}
-
-	panic("unreachable")
-}
-
-func AdministratorDataSourceRoleDeviceadminSchema() dsschema.SingleNestedAttribute {
-	return dsschema.SingleNestedAttribute{
-		Description: "",
-		Optional:    true,
-		Computed:    true,
-
-		Validators: []validator.Object{
-			objectvalidator.ExactlyOneOf(path.Expressions{
-				path.MatchRelative().AtParent().AtName("superuser"),
-				path.MatchRelative().AtParent().AtName("superreader"),
-				path.MatchRelative().AtParent().AtName("deviceadmin"),
-				path.MatchRelative().AtParent().AtName("devicereader"),
-				path.MatchRelative().AtParent().AtName("vsysadmin"),
-				path.MatchRelative().AtParent().AtName("vsysreader"),
-				path.MatchRelative().AtParent().AtName("custom"),
-			}...),
-		},
-		Attributes: map[string]dsschema.Attribute{},
-	}
-}
-
-func (o *AdministratorDataSourceRoleDeviceadminObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorDataSourceRoleDeviceadminSchema()
-	if attr, ok := schema.Attributes[name]; !ok {
-		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
-	} else {
-		switch attr := attr.(type) {
-		case dsschema.ListNestedAttribute:
-			return attr.NestedObject.Type()
-		case dsschema.MapNestedAttribute:
-			return attr.NestedObject.Type()
-		default:
-			return attr.GetType()
-		}
-	}
-
-	panic("unreachable")
-}
-
-func AdministratorDataSourceRoleDevicereaderSchema() dsschema.SingleNestedAttribute {
-	return dsschema.SingleNestedAttribute{
-		Description: "",
-		Optional:    true,
-		Computed:    true,
-
-		Validators: []validator.Object{
-			objectvalidator.ExactlyOneOf(path.Expressions{
-				path.MatchRelative().AtParent().AtName("superuser"),
-				path.MatchRelative().AtParent().AtName("superreader"),
-				path.MatchRelative().AtParent().AtName("deviceadmin"),
-				path.MatchRelative().AtParent().AtName("devicereader"),
-				path.MatchRelative().AtParent().AtName("vsysadmin"),
-				path.MatchRelative().AtParent().AtName("vsysreader"),
-				path.MatchRelative().AtParent().AtName("custom"),
-			}...),
-		},
-		Attributes: map[string]dsschema.Attribute{},
-	}
-}
-
-func (o *AdministratorDataSourceRoleDevicereaderObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorDataSourceRoleDevicereaderSchema()
-	if attr, ok := schema.Attributes[name]; !ok {
-		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
-	} else {
-		switch attr := attr.(type) {
-		case dsschema.ListNestedAttribute:
-			return attr.NestedObject.Type()
-		case dsschema.MapNestedAttribute:
-			return attr.NestedObject.Type()
-		default:
-			return attr.GetType()
-		}
-	}
-
-	panic("unreachable")
-}
-
-func AdministratorDataSourceRoleVsysadminSchema() dsschema.SingleNestedAttribute {
-	return dsschema.SingleNestedAttribute{
-		Description: "",
-		Optional:    true,
-		Computed:    true,
-
-		Validators: []validator.Object{
-			objectvalidator.ExactlyOneOf(path.Expressions{
-				path.MatchRelative().AtParent().AtName("superuser"),
-				path.MatchRelative().AtParent().AtName("superreader"),
-				path.MatchRelative().AtParent().AtName("deviceadmin"),
-				path.MatchRelative().AtParent().AtName("devicereader"),
-				path.MatchRelative().AtParent().AtName("vsysadmin"),
-				path.MatchRelative().AtParent().AtName("vsysreader"),
-				path.MatchRelative().AtParent().AtName("custom"),
-			}...),
-		},
-		Attributes: map[string]dsschema.Attribute{},
-	}
-}
-
-func (o *AdministratorDataSourceRoleVsysadminObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorDataSourceRoleVsysadminSchema()
-	if attr, ok := schema.Attributes[name]; !ok {
-		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
-	} else {
-		switch attr := attr.(type) {
-		case dsschema.ListNestedAttribute:
-			return attr.NestedObject.Type()
-		case dsschema.MapNestedAttribute:
-			return attr.NestedObject.Type()
-		default:
-			return attr.GetType()
-		}
-	}
-
-	panic("unreachable")
-}
-
-func AdministratorDataSourceRoleVsysreaderSchema() dsschema.SingleNestedAttribute {
-	return dsschema.SingleNestedAttribute{
-		Description: "",
-		Optional:    true,
-		Computed:    true,
-
-		Validators: []validator.Object{
-			objectvalidator.ExactlyOneOf(path.Expressions{
-				path.MatchRelative().AtParent().AtName("superuser"),
-				path.MatchRelative().AtParent().AtName("superreader"),
-				path.MatchRelative().AtParent().AtName("deviceadmin"),
-				path.MatchRelative().AtParent().AtName("devicereader"),
-				path.MatchRelative().AtParent().AtName("vsysadmin"),
-				path.MatchRelative().AtParent().AtName("vsysreader"),
-				path.MatchRelative().AtParent().AtName("custom"),
-			}...),
-		},
-		Attributes: map[string]dsschema.Attribute{},
-	}
-}
-
-func (o *AdministratorDataSourceRoleVsysreaderObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorDataSourceRoleVsysreaderSchema()
-	if attr, ok := schema.Attributes[name]; !ok {
-		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
-	} else {
-		switch attr := attr.(type) {
-		case dsschema.ListNestedAttribute:
-			return attr.NestedObject.Type()
-		case dsschema.MapNestedAttribute:
-			return attr.NestedObject.Type()
-		default:
-			return attr.GetType()
-		}
-	}
-
-	panic("unreachable")
-}
-
-func AdministratorDataSourceRoleCustomSchema() dsschema.SingleNestedAttribute {
-	return dsschema.SingleNestedAttribute{
-		Description: "",
-		Optional:    true,
-		Computed:    true,
-
-		Validators: []validator.Object{
-			objectvalidator.ExactlyOneOf(path.Expressions{
-				path.MatchRelative().AtParent().AtName("superuser"),
-				path.MatchRelative().AtParent().AtName("superreader"),
-				path.MatchRelative().AtParent().AtName("deviceadmin"),
-				path.MatchRelative().AtParent().AtName("devicereader"),
-				path.MatchRelative().AtParent().AtName("vsysadmin"),
-				path.MatchRelative().AtParent().AtName("vsysreader"),
-				path.MatchRelative().AtParent().AtName("custom"),
-			}...),
-		},
 		Attributes: map[string]dsschema.Attribute{
 
 			"profile": dsschema.StringAttribute{
@@ -1158,8 +627,8 @@ func AdministratorDataSourceRoleCustomSchema() dsschema.SingleNestedAttribute {
 	}
 }
 
-func (o *AdministratorDataSourceRoleCustomObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorDataSourceRoleCustomSchema()
+func (o *AdministratorDataSourcePermissionsRoleBasedCustomObject) getTypeFor(name string) attr.Type {
+	schema := AdministratorDataSourcePermissionsRoleBasedCustomSchema()
 	if attr, ok := schema.Attributes[name]; !ok {
 		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
 	} else {
@@ -1331,31 +800,21 @@ type AdministratorResourceModel struct {
 	AuthenticationProfile types.String `tfsdk:"authentication_profile"`
 	PublicKey             types.String `tfsdk:"public_key"`
 	Password              types.String `tfsdk:"password"`
-	Disabled              types.Bool   `tfsdk:"disabled"`
-	Role                  types.Object `tfsdk:"role"`
+	Permissions           types.Object `tfsdk:"permissions"`
 }
-type AdministratorResourceRoleObject struct {
-	Superuser    types.Object `tfsdk:"superuser"`
-	Superreader  types.Object `tfsdk:"superreader"`
-	Deviceadmin  types.Object `tfsdk:"deviceadmin"`
-	Devicereader types.Object `tfsdk:"devicereader"`
-	Vsysadmin    types.Object `tfsdk:"vsysadmin"`
-	Vsysreader   types.Object `tfsdk:"vsysreader"`
+type AdministratorResourcePermissionsObject struct {
+	RoleBased types.Object `tfsdk:"role_based"`
+}
+type AdministratorResourcePermissionsRoleBasedObject struct {
+	Superuser    types.Bool   `tfsdk:"superuser"`
+	Superreader  types.Bool   `tfsdk:"superreader"`
+	Deviceadmin  types.Bool   `tfsdk:"deviceadmin"`
+	Devicereader types.Bool   `tfsdk:"devicereader"`
+	Vsysadmin    types.Bool   `tfsdk:"vsysadmin"`
+	Vsysreader   types.Bool   `tfsdk:"vsysreader"`
 	Custom       types.Object `tfsdk:"custom"`
 }
-type AdministratorResourceRoleSuperuserObject struct {
-}
-type AdministratorResourceRoleSuperreaderObject struct {
-}
-type AdministratorResourceRoleDeviceadminObject struct {
-}
-type AdministratorResourceRoleDevicereaderObject struct {
-}
-type AdministratorResourceRoleVsysadminObject struct {
-}
-type AdministratorResourceRoleVsysreaderObject struct {
-}
-type AdministratorResourceRoleCustomObject struct {
+type AdministratorResourcePermissionsRoleBasedCustomObject struct {
 	Profile types.String `tfsdk:"profile"`
 }
 
@@ -1370,74 +829,32 @@ func (o *AdministratorResourceModel) ValidateConfig(ctx context.Context, resp *r
 			)
 		}
 	}
-	if !o.Role.IsUnknown() && !o.Role.IsNull() {
-		var nestedObj AdministratorResourceRoleObject
-		diags := o.Role.As(ctx, &nestedObj, basetypes.ObjectAsOptions{})
+	if !o.Permissions.IsUnknown() && !o.Permissions.IsNull() {
+		var nestedObj AdministratorResourcePermissionsObject
+		diags := o.Permissions.As(ctx, &nestedObj, basetypes.ObjectAsOptions{})
 		if diags.HasError() {
 			resp.Diagnostics.Append(diags...)
 		} else {
-			nestedObj.ValidateConfig(ctx, resp, path.AtName("role"))
+			nestedObj.ValidateConfig(ctx, resp, path.AtName("permissions"))
 		}
 	}
 }
 
-func (o *AdministratorResourceRoleObject) ValidateConfig(ctx context.Context, resp *resource.ValidateConfigResponse, path path.Path) {
-	if !o.Superuser.IsUnknown() && !o.Superuser.IsNull() {
-		var nestedObj AdministratorResourceRoleSuperuserObject
-		diags := o.Superuser.As(ctx, &nestedObj, basetypes.ObjectAsOptions{})
+func (o *AdministratorResourcePermissionsObject) ValidateConfig(ctx context.Context, resp *resource.ValidateConfigResponse, path path.Path) {
+	if !o.RoleBased.IsUnknown() && !o.RoleBased.IsNull() {
+		var nestedObj AdministratorResourcePermissionsRoleBasedObject
+		diags := o.RoleBased.As(ctx, &nestedObj, basetypes.ObjectAsOptions{})
 		if diags.HasError() {
 			resp.Diagnostics.Append(diags...)
 		} else {
-			nestedObj.ValidateConfig(ctx, resp, path.AtName("superuser"))
+			nestedObj.ValidateConfig(ctx, resp, path.AtName("role_based"))
 		}
 	}
-	if !o.Superreader.IsUnknown() && !o.Superreader.IsNull() {
-		var nestedObj AdministratorResourceRoleSuperreaderObject
-		diags := o.Superreader.As(ctx, &nestedObj, basetypes.ObjectAsOptions{})
-		if diags.HasError() {
-			resp.Diagnostics.Append(diags...)
-		} else {
-			nestedObj.ValidateConfig(ctx, resp, path.AtName("superreader"))
-		}
-	}
-	if !o.Deviceadmin.IsUnknown() && !o.Deviceadmin.IsNull() {
-		var nestedObj AdministratorResourceRoleDeviceadminObject
-		diags := o.Deviceadmin.As(ctx, &nestedObj, basetypes.ObjectAsOptions{})
-		if diags.HasError() {
-			resp.Diagnostics.Append(diags...)
-		} else {
-			nestedObj.ValidateConfig(ctx, resp, path.AtName("deviceadmin"))
-		}
-	}
-	if !o.Devicereader.IsUnknown() && !o.Devicereader.IsNull() {
-		var nestedObj AdministratorResourceRoleDevicereaderObject
-		diags := o.Devicereader.As(ctx, &nestedObj, basetypes.ObjectAsOptions{})
-		if diags.HasError() {
-			resp.Diagnostics.Append(diags...)
-		} else {
-			nestedObj.ValidateConfig(ctx, resp, path.AtName("devicereader"))
-		}
-	}
-	if !o.Vsysadmin.IsUnknown() && !o.Vsysadmin.IsNull() {
-		var nestedObj AdministratorResourceRoleVsysadminObject
-		diags := o.Vsysadmin.As(ctx, &nestedObj, basetypes.ObjectAsOptions{})
-		if diags.HasError() {
-			resp.Diagnostics.Append(diags...)
-		} else {
-			nestedObj.ValidateConfig(ctx, resp, path.AtName("vsysadmin"))
-		}
-	}
-	if !o.Vsysreader.IsUnknown() && !o.Vsysreader.IsNull() {
-		var nestedObj AdministratorResourceRoleVsysreaderObject
-		diags := o.Vsysreader.As(ctx, &nestedObj, basetypes.ObjectAsOptions{})
-		if diags.HasError() {
-			resp.Diagnostics.Append(diags...)
-		} else {
-			nestedObj.ValidateConfig(ctx, resp, path.AtName("vsysreader"))
-		}
-	}
+}
+
+func (o *AdministratorResourcePermissionsRoleBasedObject) ValidateConfig(ctx context.Context, resp *resource.ValidateConfigResponse, path path.Path) {
 	if !o.Custom.IsUnknown() && !o.Custom.IsNull() {
-		var nestedObj AdministratorResourceRoleCustomObject
+		var nestedObj AdministratorResourcePermissionsRoleBasedCustomObject
 		diags := o.Custom.As(ctx, &nestedObj, basetypes.ObjectAsOptions{})
 		if diags.HasError() {
 			resp.Diagnostics.Append(diags...)
@@ -1447,25 +864,7 @@ func (o *AdministratorResourceRoleObject) ValidateConfig(ctx context.Context, re
 	}
 }
 
-func (o *AdministratorResourceRoleSuperuserObject) ValidateConfig(ctx context.Context, resp *resource.ValidateConfigResponse, path path.Path) {
-}
-
-func (o *AdministratorResourceRoleSuperreaderObject) ValidateConfig(ctx context.Context, resp *resource.ValidateConfigResponse, path path.Path) {
-}
-
-func (o *AdministratorResourceRoleDeviceadminObject) ValidateConfig(ctx context.Context, resp *resource.ValidateConfigResponse, path path.Path) {
-}
-
-func (o *AdministratorResourceRoleDevicereaderObject) ValidateConfig(ctx context.Context, resp *resource.ValidateConfigResponse, path path.Path) {
-}
-
-func (o *AdministratorResourceRoleVsysadminObject) ValidateConfig(ctx context.Context, resp *resource.ValidateConfigResponse, path path.Path) {
-}
-
-func (o *AdministratorResourceRoleVsysreaderObject) ValidateConfig(ctx context.Context, resp *resource.ValidateConfigResponse, path path.Path) {
-}
-
-func (o *AdministratorResourceRoleCustomObject) ValidateConfig(ctx context.Context, resp *resource.ValidateConfigResponse, path path.Path) {
+func (o *AdministratorResourcePermissionsRoleBasedCustomObject) ValidateConfig(ctx context.Context, resp *resource.ValidateConfigResponse, path path.Path) {
 }
 
 func (o *AdministratorResource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
@@ -1507,12 +906,7 @@ func AdministratorResourceSchema() rsschema.Schema {
 				Sensitive:   true,
 			},
 
-			"disabled": rsschema.BoolAttribute{
-				Description: "Disable this administrator account",
-				Optional:    true,
-			},
-
-			"role": AdministratorResourceRoleSchema(),
+			"permissions": AdministratorResourcePermissionsSchema(),
 		},
 	}
 }
@@ -1535,31 +929,19 @@ func (o *AdministratorResourceModel) getTypeFor(name string) attr.Type {
 	panic("unreachable")
 }
 
-func AdministratorResourceRoleSchema() rsschema.SingleNestedAttribute {
+func AdministratorResourcePermissionsSchema() rsschema.SingleNestedAttribute {
 	return rsschema.SingleNestedAttribute{
 		Description: "",
 		Optional:    true,
 		Attributes: map[string]rsschema.Attribute{
 
-			"superuser": AdministratorResourceRoleSuperuserSchema(),
-
-			"superreader": AdministratorResourceRoleSuperreaderSchema(),
-
-			"deviceadmin": AdministratorResourceRoleDeviceadminSchema(),
-
-			"devicereader": AdministratorResourceRoleDevicereaderSchema(),
-
-			"vsysadmin": AdministratorResourceRoleVsysadminSchema(),
-
-			"vsysreader": AdministratorResourceRoleVsysreaderSchema(),
-
-			"custom": AdministratorResourceRoleCustomSchema(),
+			"role_based": AdministratorResourcePermissionsRoleBasedSchema(),
 		},
 	}
 }
 
-func (o *AdministratorResourceRoleObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorResourceRoleSchema()
+func (o *AdministratorResourcePermissionsObject) getTypeFor(name string) attr.Type {
+	schema := AdministratorResourcePermissionsSchema()
 	if attr, ok := schema.Attributes[name]; !ok {
 		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
 	} else {
@@ -1576,28 +958,49 @@ func (o *AdministratorResourceRoleObject) getTypeFor(name string) attr.Type {
 	panic("unreachable")
 }
 
-func AdministratorResourceRoleSuperuserSchema() rsschema.SingleNestedAttribute {
+func AdministratorResourcePermissionsRoleBasedSchema() rsschema.SingleNestedAttribute {
 	return rsschema.SingleNestedAttribute{
 		Description: "",
 		Optional:    true,
+		Attributes: map[string]rsschema.Attribute{
 
-		Validators: []validator.Object{
-			objectvalidator.ExactlyOneOf(path.Expressions{
-				path.MatchRelative().AtParent().AtName("superuser"),
-				path.MatchRelative().AtParent().AtName("superreader"),
-				path.MatchRelative().AtParent().AtName("deviceadmin"),
-				path.MatchRelative().AtParent().AtName("devicereader"),
-				path.MatchRelative().AtParent().AtName("vsysadmin"),
-				path.MatchRelative().AtParent().AtName("vsysreader"),
-				path.MatchRelative().AtParent().AtName("custom"),
-			}...),
+			"superuser": rsschema.BoolAttribute{
+				Description: "Full system access",
+				Optional:    true,
+			},
+
+			"superreader": rsschema.BoolAttribute{
+				Description: "Read-only access to entire system",
+				Optional:    true,
+			},
+
+			"deviceadmin": rsschema.BoolAttribute{
+				Description: "Device administrator access (all vsys)",
+				Optional:    true,
+			},
+
+			"devicereader": rsschema.BoolAttribute{
+				Description: "Device read-only access (all vsys)",
+				Optional:    true,
+			},
+
+			"vsysadmin": rsschema.BoolAttribute{
+				Description: "Virtual system administrator access",
+				Optional:    true,
+			},
+
+			"vsysreader": rsschema.BoolAttribute{
+				Description: "Virtual system read-only access",
+				Optional:    true,
+			},
+
+			"custom": AdministratorResourcePermissionsRoleBasedCustomSchema(),
 		},
-		Attributes: map[string]rsschema.Attribute{},
 	}
 }
 
-func (o *AdministratorResourceRoleSuperuserObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorResourceRoleSuperuserSchema()
+func (o *AdministratorResourcePermissionsRoleBasedObject) getTypeFor(name string) attr.Type {
+	schema := AdministratorResourcePermissionsRoleBasedSchema()
 	if attr, ok := schema.Attributes[name]; !ok {
 		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
 	} else {
@@ -1614,212 +1017,10 @@ func (o *AdministratorResourceRoleSuperuserObject) getTypeFor(name string) attr.
 	panic("unreachable")
 }
 
-func AdministratorResourceRoleSuperreaderSchema() rsschema.SingleNestedAttribute {
+func AdministratorResourcePermissionsRoleBasedCustomSchema() rsschema.SingleNestedAttribute {
 	return rsschema.SingleNestedAttribute{
 		Description: "",
 		Optional:    true,
-
-		Validators: []validator.Object{
-			objectvalidator.ExactlyOneOf(path.Expressions{
-				path.MatchRelative().AtParent().AtName("superuser"),
-				path.MatchRelative().AtParent().AtName("superreader"),
-				path.MatchRelative().AtParent().AtName("deviceadmin"),
-				path.MatchRelative().AtParent().AtName("devicereader"),
-				path.MatchRelative().AtParent().AtName("vsysadmin"),
-				path.MatchRelative().AtParent().AtName("vsysreader"),
-				path.MatchRelative().AtParent().AtName("custom"),
-			}...),
-		},
-		Attributes: map[string]rsschema.Attribute{},
-	}
-}
-
-func (o *AdministratorResourceRoleSuperreaderObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorResourceRoleSuperreaderSchema()
-	if attr, ok := schema.Attributes[name]; !ok {
-		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
-	} else {
-		switch attr := attr.(type) {
-		case rsschema.ListNestedAttribute:
-			return attr.NestedObject.Type()
-		case rsschema.MapNestedAttribute:
-			return attr.NestedObject.Type()
-		default:
-			return attr.GetType()
-		}
-	}
-
-	panic("unreachable")
-}
-
-func AdministratorResourceRoleDeviceadminSchema() rsschema.SingleNestedAttribute {
-	return rsschema.SingleNestedAttribute{
-		Description: "",
-		Optional:    true,
-
-		Validators: []validator.Object{
-			objectvalidator.ExactlyOneOf(path.Expressions{
-				path.MatchRelative().AtParent().AtName("superuser"),
-				path.MatchRelative().AtParent().AtName("superreader"),
-				path.MatchRelative().AtParent().AtName("deviceadmin"),
-				path.MatchRelative().AtParent().AtName("devicereader"),
-				path.MatchRelative().AtParent().AtName("vsysadmin"),
-				path.MatchRelative().AtParent().AtName("vsysreader"),
-				path.MatchRelative().AtParent().AtName("custom"),
-			}...),
-		},
-		Attributes: map[string]rsschema.Attribute{},
-	}
-}
-
-func (o *AdministratorResourceRoleDeviceadminObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorResourceRoleDeviceadminSchema()
-	if attr, ok := schema.Attributes[name]; !ok {
-		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
-	} else {
-		switch attr := attr.(type) {
-		case rsschema.ListNestedAttribute:
-			return attr.NestedObject.Type()
-		case rsschema.MapNestedAttribute:
-			return attr.NestedObject.Type()
-		default:
-			return attr.GetType()
-		}
-	}
-
-	panic("unreachable")
-}
-
-func AdministratorResourceRoleDevicereaderSchema() rsschema.SingleNestedAttribute {
-	return rsschema.SingleNestedAttribute{
-		Description: "",
-		Optional:    true,
-
-		Validators: []validator.Object{
-			objectvalidator.ExactlyOneOf(path.Expressions{
-				path.MatchRelative().AtParent().AtName("superuser"),
-				path.MatchRelative().AtParent().AtName("superreader"),
-				path.MatchRelative().AtParent().AtName("deviceadmin"),
-				path.MatchRelative().AtParent().AtName("devicereader"),
-				path.MatchRelative().AtParent().AtName("vsysadmin"),
-				path.MatchRelative().AtParent().AtName("vsysreader"),
-				path.MatchRelative().AtParent().AtName("custom"),
-			}...),
-		},
-		Attributes: map[string]rsschema.Attribute{},
-	}
-}
-
-func (o *AdministratorResourceRoleDevicereaderObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorResourceRoleDevicereaderSchema()
-	if attr, ok := schema.Attributes[name]; !ok {
-		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
-	} else {
-		switch attr := attr.(type) {
-		case rsschema.ListNestedAttribute:
-			return attr.NestedObject.Type()
-		case rsschema.MapNestedAttribute:
-			return attr.NestedObject.Type()
-		default:
-			return attr.GetType()
-		}
-	}
-
-	panic("unreachable")
-}
-
-func AdministratorResourceRoleVsysadminSchema() rsschema.SingleNestedAttribute {
-	return rsschema.SingleNestedAttribute{
-		Description: "",
-		Optional:    true,
-
-		Validators: []validator.Object{
-			objectvalidator.ExactlyOneOf(path.Expressions{
-				path.MatchRelative().AtParent().AtName("superuser"),
-				path.MatchRelative().AtParent().AtName("superreader"),
-				path.MatchRelative().AtParent().AtName("deviceadmin"),
-				path.MatchRelative().AtParent().AtName("devicereader"),
-				path.MatchRelative().AtParent().AtName("vsysadmin"),
-				path.MatchRelative().AtParent().AtName("vsysreader"),
-				path.MatchRelative().AtParent().AtName("custom"),
-			}...),
-		},
-		Attributes: map[string]rsschema.Attribute{},
-	}
-}
-
-func (o *AdministratorResourceRoleVsysadminObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorResourceRoleVsysadminSchema()
-	if attr, ok := schema.Attributes[name]; !ok {
-		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
-	} else {
-		switch attr := attr.(type) {
-		case rsschema.ListNestedAttribute:
-			return attr.NestedObject.Type()
-		case rsschema.MapNestedAttribute:
-			return attr.NestedObject.Type()
-		default:
-			return attr.GetType()
-		}
-	}
-
-	panic("unreachable")
-}
-
-func AdministratorResourceRoleVsysreaderSchema() rsschema.SingleNestedAttribute {
-	return rsschema.SingleNestedAttribute{
-		Description: "",
-		Optional:    true,
-
-		Validators: []validator.Object{
-			objectvalidator.ExactlyOneOf(path.Expressions{
-				path.MatchRelative().AtParent().AtName("superuser"),
-				path.MatchRelative().AtParent().AtName("superreader"),
-				path.MatchRelative().AtParent().AtName("deviceadmin"),
-				path.MatchRelative().AtParent().AtName("devicereader"),
-				path.MatchRelative().AtParent().AtName("vsysadmin"),
-				path.MatchRelative().AtParent().AtName("vsysreader"),
-				path.MatchRelative().AtParent().AtName("custom"),
-			}...),
-		},
-		Attributes: map[string]rsschema.Attribute{},
-	}
-}
-
-func (o *AdministratorResourceRoleVsysreaderObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorResourceRoleVsysreaderSchema()
-	if attr, ok := schema.Attributes[name]; !ok {
-		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
-	} else {
-		switch attr := attr.(type) {
-		case rsschema.ListNestedAttribute:
-			return attr.NestedObject.Type()
-		case rsschema.MapNestedAttribute:
-			return attr.NestedObject.Type()
-		default:
-			return attr.GetType()
-		}
-	}
-
-	panic("unreachable")
-}
-
-func AdministratorResourceRoleCustomSchema() rsschema.SingleNestedAttribute {
-	return rsschema.SingleNestedAttribute{
-		Description: "",
-		Optional:    true,
-
-		Validators: []validator.Object{
-			objectvalidator.ExactlyOneOf(path.Expressions{
-				path.MatchRelative().AtParent().AtName("superuser"),
-				path.MatchRelative().AtParent().AtName("superreader"),
-				path.MatchRelative().AtParent().AtName("deviceadmin"),
-				path.MatchRelative().AtParent().AtName("devicereader"),
-				path.MatchRelative().AtParent().AtName("vsysadmin"),
-				path.MatchRelative().AtParent().AtName("vsysreader"),
-				path.MatchRelative().AtParent().AtName("custom"),
-			}...),
-		},
 		Attributes: map[string]rsschema.Attribute{
 
 			"profile": rsschema.StringAttribute{
@@ -1830,8 +1031,8 @@ func AdministratorResourceRoleCustomSchema() rsschema.SingleNestedAttribute {
 	}
 }
 
-func (o *AdministratorResourceRoleCustomObject) getTypeFor(name string) attr.Type {
-	schema := AdministratorResourceRoleCustomSchema()
+func (o *AdministratorResourcePermissionsRoleBasedCustomObject) getTypeFor(name string) attr.Type {
+	schema := AdministratorResourcePermissionsRoleBasedCustomSchema()
 	if attr, ok := schema.Attributes[name]; !ok {
 		panic(fmt.Sprintf("could not resolve schema for attribute %s", name))
 	} else {
@@ -1879,7 +1080,7 @@ func (o *AdministratorResourceModel) AttributeTypes() map[string]attr.Type {
 
 	var locationObj AdministratorLocation
 
-	var roleObj *AdministratorResourceRoleObject
+	var permissionsObj *AdministratorResourcePermissionsObject
 	return map[string]attr.Type{
 		"location": types.ObjectType{
 			AttrTypes: locationObj.AttributeTypes(),
@@ -1888,9 +1089,8 @@ func (o *AdministratorResourceModel) AttributeTypes() map[string]attr.Type {
 		"authentication_profile": types.StringType,
 		"public_key":             types.StringType,
 		"password":               types.StringType,
-		"disabled":               types.BoolType,
-		"role": types.ObjectType{
-			AttrTypes: roleObj.AttributeTypes(),
+		"permissions": types.ObjectType{
+			AttrTypes: permissionsObj.AttributeTypes(),
 		},
 	}
 }
@@ -1902,131 +1102,58 @@ func (o AdministratorResourceModel) AncestorName() string {
 func (o AdministratorResourceModel) EntryName() *string {
 	return nil
 }
-func (o *AdministratorResourceRoleObject) AttributeTypes() map[string]attr.Type {
+func (o *AdministratorResourcePermissionsObject) AttributeTypes() map[string]attr.Type {
 
-	var superuserObj *AdministratorResourceRoleSuperuserObject
-
-	var superreaderObj *AdministratorResourceRoleSuperreaderObject
-
-	var deviceadminObj *AdministratorResourceRoleDeviceadminObject
-
-	var devicereaderObj *AdministratorResourceRoleDevicereaderObject
-
-	var vsysadminObj *AdministratorResourceRoleVsysadminObject
-
-	var vsysreaderObj *AdministratorResourceRoleVsysreaderObject
-
-	var customObj *AdministratorResourceRoleCustomObject
+	var roleBasedObj *AdministratorResourcePermissionsRoleBasedObject
 	return map[string]attr.Type{
-		"superuser": types.ObjectType{
-			AttrTypes: superuserObj.AttributeTypes(),
+		"role_based": types.ObjectType{
+			AttrTypes: roleBasedObj.AttributeTypes(),
 		},
-		"superreader": types.ObjectType{
-			AttrTypes: superreaderObj.AttributeTypes(),
-		},
-		"deviceadmin": types.ObjectType{
-			AttrTypes: deviceadminObj.AttributeTypes(),
-		},
-		"devicereader": types.ObjectType{
-			AttrTypes: devicereaderObj.AttributeTypes(),
-		},
-		"vsysadmin": types.ObjectType{
-			AttrTypes: vsysadminObj.AttributeTypes(),
-		},
-		"vsysreader": types.ObjectType{
-			AttrTypes: vsysreaderObj.AttributeTypes(),
-		},
+	}
+}
+
+func (o AdministratorResourcePermissionsObject) AncestorName() string {
+	return "permissions"
+}
+
+func (o AdministratorResourcePermissionsObject) EntryName() *string {
+	return nil
+}
+func (o *AdministratorResourcePermissionsRoleBasedObject) AttributeTypes() map[string]attr.Type {
+
+	var customObj *AdministratorResourcePermissionsRoleBasedCustomObject
+	return map[string]attr.Type{
+		"superuser":    types.BoolType,
+		"superreader":  types.BoolType,
+		"deviceadmin":  types.BoolType,
+		"devicereader": types.BoolType,
+		"vsysadmin":    types.BoolType,
+		"vsysreader":   types.BoolType,
 		"custom": types.ObjectType{
 			AttrTypes: customObj.AttributeTypes(),
 		},
 	}
 }
 
-func (o AdministratorResourceRoleObject) AncestorName() string {
-	return "role"
+func (o AdministratorResourcePermissionsRoleBasedObject) AncestorName() string {
+	return "role-based"
 }
 
-func (o AdministratorResourceRoleObject) EntryName() *string {
+func (o AdministratorResourcePermissionsRoleBasedObject) EntryName() *string {
 	return nil
 }
-func (o *AdministratorResourceRoleSuperuserObject) AttributeTypes() map[string]attr.Type {
-	return map[string]attr.Type{}
-}
-
-func (o AdministratorResourceRoleSuperuserObject) AncestorName() string {
-	return "superuser"
-}
-
-func (o AdministratorResourceRoleSuperuserObject) EntryName() *string {
-	return nil
-}
-func (o *AdministratorResourceRoleSuperreaderObject) AttributeTypes() map[string]attr.Type {
-	return map[string]attr.Type{}
-}
-
-func (o AdministratorResourceRoleSuperreaderObject) AncestorName() string {
-	return "superreader"
-}
-
-func (o AdministratorResourceRoleSuperreaderObject) EntryName() *string {
-	return nil
-}
-func (o *AdministratorResourceRoleDeviceadminObject) AttributeTypes() map[string]attr.Type {
-	return map[string]attr.Type{}
-}
-
-func (o AdministratorResourceRoleDeviceadminObject) AncestorName() string {
-	return "deviceadmin"
-}
-
-func (o AdministratorResourceRoleDeviceadminObject) EntryName() *string {
-	return nil
-}
-func (o *AdministratorResourceRoleDevicereaderObject) AttributeTypes() map[string]attr.Type {
-	return map[string]attr.Type{}
-}
-
-func (o AdministratorResourceRoleDevicereaderObject) AncestorName() string {
-	return "devicereader"
-}
-
-func (o AdministratorResourceRoleDevicereaderObject) EntryName() *string {
-	return nil
-}
-func (o *AdministratorResourceRoleVsysadminObject) AttributeTypes() map[string]attr.Type {
-	return map[string]attr.Type{}
-}
-
-func (o AdministratorResourceRoleVsysadminObject) AncestorName() string {
-	return "vsysadmin"
-}
-
-func (o AdministratorResourceRoleVsysadminObject) EntryName() *string {
-	return nil
-}
-func (o *AdministratorResourceRoleVsysreaderObject) AttributeTypes() map[string]attr.Type {
-	return map[string]attr.Type{}
-}
-
-func (o AdministratorResourceRoleVsysreaderObject) AncestorName() string {
-	return "vsysreader"
-}
-
-func (o AdministratorResourceRoleVsysreaderObject) EntryName() *string {
-	return nil
-}
-func (o *AdministratorResourceRoleCustomObject) AttributeTypes() map[string]attr.Type {
+func (o *AdministratorResourcePermissionsRoleBasedCustomObject) AttributeTypes() map[string]attr.Type {
 
 	return map[string]attr.Type{
 		"profile": types.StringType,
 	}
 }
 
-func (o AdministratorResourceRoleCustomObject) AncestorName() string {
+func (o AdministratorResourcePermissionsRoleBasedCustomObject) AncestorName() string {
 	return "custom"
 }
 
-func (o AdministratorResourceRoleCustomObject) EntryName() *string {
+func (o AdministratorResourcePermissionsRoleBasedCustomObject) EntryName() *string {
 	return nil
 }
 
@@ -2049,20 +1176,19 @@ func (o *AdministratorResourceModel) CopyToPango(ctx context.Context, client pan
 		}
 		password_value = o.Password.ValueStringPointer()
 	}
-	disabled_value := o.Disabled.ValueBoolPointer()
-	var role_entry *administrator.Role
-	if !o.Role.IsUnknown() && !o.Role.IsNull() {
-		if *obj != nil && (*obj).Role != nil {
-			role_entry = (*obj).Role
+	var permissions_entry *administrator.Permissions
+	if !o.Permissions.IsUnknown() && !o.Permissions.IsNull() {
+		if *obj != nil && (*obj).Permissions != nil {
+			permissions_entry = (*obj).Permissions
 		} else {
-			role_entry = new(administrator.Role)
+			permissions_entry = new(administrator.Permissions)
 		}
-		var object *AdministratorResourceRoleObject
-		diags.Append(o.Role.As(ctx, &object, basetypes.ObjectAsOptions{})...)
+		var object *AdministratorResourcePermissionsObject
+		diags.Append(o.Permissions.As(ctx, &object, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
 			return diags
 		}
-		diags.Append(object.CopyToPango(ctx, client, ancestors, &role_entry, ev)...)
+		diags.Append(object.CopyToPango(ctx, client, ancestors, &permissions_entry, ev)...)
 		if diags.HasError() {
 			return diags
 		}
@@ -2075,123 +1201,53 @@ func (o *AdministratorResourceModel) CopyToPango(ctx context.Context, client pan
 	(*obj).AuthenticationProfile = authenticationProfile_value
 	(*obj).PublicKey = publicKey_value
 	(*obj).Phash = password_value
-	(*obj).Disabled = disabled_value
-	(*obj).Role = role_entry
+	(*obj).Permissions = permissions_entry
 
 	return diags
 }
-func (o *AdministratorResourceRoleObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.Role, ev *EncryptedValuesManager) diag.Diagnostics {
+func (o *AdministratorResourcePermissionsObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.Permissions, ev *EncryptedValuesManager) diag.Diagnostics {
 	var diags diag.Diagnostics
-	var superuser_entry *administrator.RoleSuperuser
-	if !o.Superuser.IsUnknown() && !o.Superuser.IsNull() {
-		if *obj != nil && (*obj).Superuser != nil {
-			superuser_entry = (*obj).Superuser
+	var roleBased_entry *administrator.PermissionsRoleBased
+	if !o.RoleBased.IsUnknown() && !o.RoleBased.IsNull() {
+		if *obj != nil && (*obj).RoleBased != nil {
+			roleBased_entry = (*obj).RoleBased
 		} else {
-			superuser_entry = new(administrator.RoleSuperuser)
+			roleBased_entry = new(administrator.PermissionsRoleBased)
 		}
-		var object *AdministratorResourceRoleSuperuserObject
-		diags.Append(o.Superuser.As(ctx, &object, basetypes.ObjectAsOptions{})...)
+		var object *AdministratorResourcePermissionsRoleBasedObject
+		diags.Append(o.RoleBased.As(ctx, &object, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
 			return diags
 		}
-		diags.Append(object.CopyToPango(ctx, client, append(ancestors, o), &superuser_entry, ev)...)
+		diags.Append(object.CopyToPango(ctx, client, append(ancestors, o), &roleBased_entry, ev)...)
 		if diags.HasError() {
 			return diags
 		}
 	}
-	var superreader_entry *administrator.RoleSuperreader
-	if !o.Superreader.IsUnknown() && !o.Superreader.IsNull() {
-		if *obj != nil && (*obj).Superreader != nil {
-			superreader_entry = (*obj).Superreader
-		} else {
-			superreader_entry = new(administrator.RoleSuperreader)
-		}
-		var object *AdministratorResourceRoleSuperreaderObject
-		diags.Append(o.Superreader.As(ctx, &object, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-		diags.Append(object.CopyToPango(ctx, client, append(ancestors, o), &superreader_entry, ev)...)
-		if diags.HasError() {
-			return diags
-		}
+
+	if (*obj) == nil {
+		*obj = new(administrator.Permissions)
 	}
-	var deviceadmin_entry *administrator.RoleDeviceadmin
-	if !o.Deviceadmin.IsUnknown() && !o.Deviceadmin.IsNull() {
-		if *obj != nil && (*obj).Deviceadmin != nil {
-			deviceadmin_entry = (*obj).Deviceadmin
-		} else {
-			deviceadmin_entry = new(administrator.RoleDeviceadmin)
-		}
-		var object *AdministratorResourceRoleDeviceadminObject
-		diags.Append(o.Deviceadmin.As(ctx, &object, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-		diags.Append(object.CopyToPango(ctx, client, append(ancestors, o), &deviceadmin_entry, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	var devicereader_entry *administrator.RoleDevicereader
-	if !o.Devicereader.IsUnknown() && !o.Devicereader.IsNull() {
-		if *obj != nil && (*obj).Devicereader != nil {
-			devicereader_entry = (*obj).Devicereader
-		} else {
-			devicereader_entry = new(administrator.RoleDevicereader)
-		}
-		var object *AdministratorResourceRoleDevicereaderObject
-		diags.Append(o.Devicereader.As(ctx, &object, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-		diags.Append(object.CopyToPango(ctx, client, append(ancestors, o), &devicereader_entry, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	var vsysadmin_entry *administrator.RoleVsysadmin
-	if !o.Vsysadmin.IsUnknown() && !o.Vsysadmin.IsNull() {
-		if *obj != nil && (*obj).Vsysadmin != nil {
-			vsysadmin_entry = (*obj).Vsysadmin
-		} else {
-			vsysadmin_entry = new(administrator.RoleVsysadmin)
-		}
-		var object *AdministratorResourceRoleVsysadminObject
-		diags.Append(o.Vsysadmin.As(ctx, &object, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-		diags.Append(object.CopyToPango(ctx, client, append(ancestors, o), &vsysadmin_entry, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	var vsysreader_entry *administrator.RoleVsysreader
-	if !o.Vsysreader.IsUnknown() && !o.Vsysreader.IsNull() {
-		if *obj != nil && (*obj).Vsysreader != nil {
-			vsysreader_entry = (*obj).Vsysreader
-		} else {
-			vsysreader_entry = new(administrator.RoleVsysreader)
-		}
-		var object *AdministratorResourceRoleVsysreaderObject
-		diags.Append(o.Vsysreader.As(ctx, &object, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-		diags.Append(object.CopyToPango(ctx, client, append(ancestors, o), &vsysreader_entry, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	var custom_entry *administrator.RoleCustom
+	(*obj).RoleBased = roleBased_entry
+
+	return diags
+}
+func (o *AdministratorResourcePermissionsRoleBasedObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.PermissionsRoleBased, ev *EncryptedValuesManager) diag.Diagnostics {
+	var diags diag.Diagnostics
+	superuser_value := o.Superuser.ValueBoolPointer()
+	superreader_value := o.Superreader.ValueBoolPointer()
+	deviceadmin_value := o.Deviceadmin.ValueBoolPointer()
+	devicereader_value := o.Devicereader.ValueBoolPointer()
+	vsysadmin_value := o.Vsysadmin.ValueBoolPointer()
+	vsysreader_value := o.Vsysreader.ValueBoolPointer()
+	var custom_entry *administrator.PermissionsRoleBasedCustom
 	if !o.Custom.IsUnknown() && !o.Custom.IsNull() {
 		if *obj != nil && (*obj).Custom != nil {
 			custom_entry = (*obj).Custom
 		} else {
-			custom_entry = new(administrator.RoleCustom)
+			custom_entry = new(administrator.PermissionsRoleBasedCustom)
 		}
-		var object *AdministratorResourceRoleCustomObject
+		var object *AdministratorResourcePermissionsRoleBasedCustomObject
 		diags.Append(o.Custom.As(ctx, &object, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
 			return diags
@@ -2203,78 +1259,24 @@ func (o *AdministratorResourceRoleObject) CopyToPango(ctx context.Context, clien
 	}
 
 	if (*obj) == nil {
-		*obj = new(administrator.Role)
+		*obj = new(administrator.PermissionsRoleBased)
 	}
-	(*obj).Superuser = superuser_entry
-	(*obj).Superreader = superreader_entry
-	(*obj).Deviceadmin = deviceadmin_entry
-	(*obj).Devicereader = devicereader_entry
-	(*obj).Vsysadmin = vsysadmin_entry
-	(*obj).Vsysreader = vsysreader_entry
+	(*obj).Superuser = superuser_value
+	(*obj).Superreader = superreader_value
+	(*obj).Deviceadmin = deviceadmin_value
+	(*obj).Devicereader = devicereader_value
+	(*obj).Vsysadmin = vsysadmin_value
+	(*obj).Vsysreader = vsysreader_value
 	(*obj).Custom = custom_entry
 
 	return diags
 }
-func (o *AdministratorResourceRoleSuperuserObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.RoleSuperuser, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if (*obj) == nil {
-		*obj = new(administrator.RoleSuperuser)
-	}
-
-	return diags
-}
-func (o *AdministratorResourceRoleSuperreaderObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.RoleSuperreader, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if (*obj) == nil {
-		*obj = new(administrator.RoleSuperreader)
-	}
-
-	return diags
-}
-func (o *AdministratorResourceRoleDeviceadminObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.RoleDeviceadmin, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if (*obj) == nil {
-		*obj = new(administrator.RoleDeviceadmin)
-	}
-
-	return diags
-}
-func (o *AdministratorResourceRoleDevicereaderObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.RoleDevicereader, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if (*obj) == nil {
-		*obj = new(administrator.RoleDevicereader)
-	}
-
-	return diags
-}
-func (o *AdministratorResourceRoleVsysadminObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.RoleVsysadmin, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if (*obj) == nil {
-		*obj = new(administrator.RoleVsysadmin)
-	}
-
-	return diags
-}
-func (o *AdministratorResourceRoleVsysreaderObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.RoleVsysreader, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if (*obj) == nil {
-		*obj = new(administrator.RoleVsysreader)
-	}
-
-	return diags
-}
-func (o *AdministratorResourceRoleCustomObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.RoleCustom, ev *EncryptedValuesManager) diag.Diagnostics {
+func (o *AdministratorResourcePermissionsRoleBasedCustomObject) CopyToPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj **administrator.PermissionsRoleBasedCustom, ev *EncryptedValuesManager) diag.Diagnostics {
 	var diags diag.Diagnostics
 	profile_value := o.Profile.ValueStringPointer()
 
 	if (*obj) == nil {
-		*obj = new(administrator.RoleCustom)
+		*obj = new(administrator.PermissionsRoleBasedCustom)
 	}
 	(*obj).Profile = profile_value
 
@@ -2284,23 +1286,23 @@ func (o *AdministratorResourceRoleCustomObject) CopyToPango(ctx context.Context,
 func (o *AdministratorResourceModel) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.Entry, ev *EncryptedValuesManager) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	var role_obj *AdministratorResourceRoleObject
-	if o.Role.IsNull() {
-		role_obj = new(AdministratorResourceRoleObject)
+	var permissions_obj *AdministratorResourcePermissionsObject
+	if o.Permissions.IsNull() {
+		permissions_obj = new(AdministratorResourcePermissionsObject)
 	} else {
-		diags.Append(o.Role.As(ctx, &role_obj, basetypes.ObjectAsOptions{})...)
+		diags.Append(o.Permissions.As(ctx, &permissions_obj, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
 			return diags
 		}
 	}
-	role_object := types.ObjectNull(role_obj.AttributeTypes())
-	if obj.Role != nil {
-		diags.Append(role_obj.CopyFromPango(ctx, client, ancestors, obj.Role, ev)...)
+	permissions_object := types.ObjectNull(permissions_obj.AttributeTypes())
+	if obj.Permissions != nil {
+		diags.Append(permissions_obj.CopyFromPango(ctx, client, ancestors, obj.Permissions, ev)...)
 		if diags.HasError() {
 			return diags
 		}
 		var diags_tmp diag.Diagnostics
-		role_object, diags_tmp = types.ObjectValueFrom(ctx, role_obj.AttributeTypes(), role_obj)
+		permissions_object, diags_tmp = types.ObjectValueFrom(ctx, permissions_obj.AttributeTypes(), permissions_obj)
 		diags.Append(diags_tmp...)
 		if diags.HasError() {
 			return diags
@@ -2340,164 +1342,52 @@ func (o *AdministratorResourceModel) CopyFromPango(ctx context.Context, client p
 			}
 		}
 	}
-	var disabled_value types.Bool
-	if obj.Disabled != nil {
-		disabled_value = types.BoolValue(*obj.Disabled)
-	}
 	o.Name = types.StringValue(obj.Name)
 	o.AuthenticationProfile = authenticationProfile_value
 	o.PublicKey = publicKey_value
 	o.Password = password_value
-	o.Disabled = disabled_value
-	o.Role = role_object
+	o.Permissions = permissions_object
 
 	return diags
 }
 
-func (o *AdministratorResourceRoleObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.Role, ev *EncryptedValuesManager) diag.Diagnostics {
+func (o *AdministratorResourcePermissionsObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.Permissions, ev *EncryptedValuesManager) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	var superuser_obj *AdministratorResourceRoleSuperuserObject
-	if o.Superuser.IsNull() {
-		superuser_obj = new(AdministratorResourceRoleSuperuserObject)
+	var roleBased_obj *AdministratorResourcePermissionsRoleBasedObject
+	if o.RoleBased.IsNull() {
+		roleBased_obj = new(AdministratorResourcePermissionsRoleBasedObject)
 	} else {
-		diags.Append(o.Superuser.As(ctx, &superuser_obj, basetypes.ObjectAsOptions{})...)
+		diags.Append(o.RoleBased.As(ctx, &roleBased_obj, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
 			return diags
 		}
 	}
-	superuser_object := types.ObjectNull(superuser_obj.AttributeTypes())
-	if obj.Superuser != nil {
-		diags.Append(superuser_obj.CopyFromPango(ctx, client, append(ancestors, o), obj.Superuser, ev)...)
+	roleBased_object := types.ObjectNull(roleBased_obj.AttributeTypes())
+	if obj.RoleBased != nil {
+		diags.Append(roleBased_obj.CopyFromPango(ctx, client, append(ancestors, o), obj.RoleBased, ev)...)
 		if diags.HasError() {
 			return diags
 		}
 		var diags_tmp diag.Diagnostics
-		superuser_object, diags_tmp = types.ObjectValueFrom(ctx, superuser_obj.AttributeTypes(), superuser_obj)
+		roleBased_object, diags_tmp = types.ObjectValueFrom(ctx, roleBased_obj.AttributeTypes(), roleBased_obj)
 		diags.Append(diags_tmp...)
 		if diags.HasError() {
 			return diags
 		}
 	}
 
-	var superreader_obj *AdministratorResourceRoleSuperreaderObject
-	if o.Superreader.IsNull() {
-		superreader_obj = new(AdministratorResourceRoleSuperreaderObject)
-	} else {
-		diags.Append(o.Superreader.As(ctx, &superreader_obj, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	superreader_object := types.ObjectNull(superreader_obj.AttributeTypes())
-	if obj.Superreader != nil {
-		diags.Append(superreader_obj.CopyFromPango(ctx, client, append(ancestors, o), obj.Superreader, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-		var diags_tmp diag.Diagnostics
-		superreader_object, diags_tmp = types.ObjectValueFrom(ctx, superreader_obj.AttributeTypes(), superreader_obj)
-		diags.Append(diags_tmp...)
-		if diags.HasError() {
-			return diags
-		}
-	}
+	o.RoleBased = roleBased_object
 
-	var deviceadmin_obj *AdministratorResourceRoleDeviceadminObject
-	if o.Deviceadmin.IsNull() {
-		deviceadmin_obj = new(AdministratorResourceRoleDeviceadminObject)
-	} else {
-		diags.Append(o.Deviceadmin.As(ctx, &deviceadmin_obj, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	deviceadmin_object := types.ObjectNull(deviceadmin_obj.AttributeTypes())
-	if obj.Deviceadmin != nil {
-		diags.Append(deviceadmin_obj.CopyFromPango(ctx, client, append(ancestors, o), obj.Deviceadmin, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-		var diags_tmp diag.Diagnostics
-		deviceadmin_object, diags_tmp = types.ObjectValueFrom(ctx, deviceadmin_obj.AttributeTypes(), deviceadmin_obj)
-		diags.Append(diags_tmp...)
-		if diags.HasError() {
-			return diags
-		}
-	}
+	return diags
+}
 
-	var devicereader_obj *AdministratorResourceRoleDevicereaderObject
-	if o.Devicereader.IsNull() {
-		devicereader_obj = new(AdministratorResourceRoleDevicereaderObject)
-	} else {
-		diags.Append(o.Devicereader.As(ctx, &devicereader_obj, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	devicereader_object := types.ObjectNull(devicereader_obj.AttributeTypes())
-	if obj.Devicereader != nil {
-		diags.Append(devicereader_obj.CopyFromPango(ctx, client, append(ancestors, o), obj.Devicereader, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-		var diags_tmp diag.Diagnostics
-		devicereader_object, diags_tmp = types.ObjectValueFrom(ctx, devicereader_obj.AttributeTypes(), devicereader_obj)
-		diags.Append(diags_tmp...)
-		if diags.HasError() {
-			return diags
-		}
-	}
+func (o *AdministratorResourcePermissionsRoleBasedObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.PermissionsRoleBased, ev *EncryptedValuesManager) diag.Diagnostics {
+	var diags diag.Diagnostics
 
-	var vsysadmin_obj *AdministratorResourceRoleVsysadminObject
-	if o.Vsysadmin.IsNull() {
-		vsysadmin_obj = new(AdministratorResourceRoleVsysadminObject)
-	} else {
-		diags.Append(o.Vsysadmin.As(ctx, &vsysadmin_obj, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	vsysadmin_object := types.ObjectNull(vsysadmin_obj.AttributeTypes())
-	if obj.Vsysadmin != nil {
-		diags.Append(vsysadmin_obj.CopyFromPango(ctx, client, append(ancestors, o), obj.Vsysadmin, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-		var diags_tmp diag.Diagnostics
-		vsysadmin_object, diags_tmp = types.ObjectValueFrom(ctx, vsysadmin_obj.AttributeTypes(), vsysadmin_obj)
-		diags.Append(diags_tmp...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-
-	var vsysreader_obj *AdministratorResourceRoleVsysreaderObject
-	if o.Vsysreader.IsNull() {
-		vsysreader_obj = new(AdministratorResourceRoleVsysreaderObject)
-	} else {
-		diags.Append(o.Vsysreader.As(ctx, &vsysreader_obj, basetypes.ObjectAsOptions{})...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-	vsysreader_object := types.ObjectNull(vsysreader_obj.AttributeTypes())
-	if obj.Vsysreader != nil {
-		diags.Append(vsysreader_obj.CopyFromPango(ctx, client, append(ancestors, o), obj.Vsysreader, ev)...)
-		if diags.HasError() {
-			return diags
-		}
-		var diags_tmp diag.Diagnostics
-		vsysreader_object, diags_tmp = types.ObjectValueFrom(ctx, vsysreader_obj.AttributeTypes(), vsysreader_obj)
-		diags.Append(diags_tmp...)
-		if diags.HasError() {
-			return diags
-		}
-	}
-
-	var custom_obj *AdministratorResourceRoleCustomObject
+	var custom_obj *AdministratorResourcePermissionsRoleBasedCustomObject
 	if o.Custom.IsNull() {
-		custom_obj = new(AdministratorResourceRoleCustomObject)
+		custom_obj = new(AdministratorResourcePermissionsRoleBasedCustomObject)
 	} else {
 		diags.Append(o.Custom.As(ctx, &custom_obj, basetypes.ObjectAsOptions{})...)
 		if diags.HasError() {
@@ -2518,54 +1408,42 @@ func (o *AdministratorResourceRoleObject) CopyFromPango(ctx context.Context, cli
 		}
 	}
 
-	o.Superuser = superuser_object
-	o.Superreader = superreader_object
-	o.Deviceadmin = deviceadmin_object
-	o.Devicereader = devicereader_object
-	o.Vsysadmin = vsysadmin_object
-	o.Vsysreader = vsysreader_object
+	var superuser_value types.Bool
+	if obj.Superuser != nil {
+		superuser_value = types.BoolValue(*obj.Superuser)
+	}
+	var superreader_value types.Bool
+	if obj.Superreader != nil {
+		superreader_value = types.BoolValue(*obj.Superreader)
+	}
+	var deviceadmin_value types.Bool
+	if obj.Deviceadmin != nil {
+		deviceadmin_value = types.BoolValue(*obj.Deviceadmin)
+	}
+	var devicereader_value types.Bool
+	if obj.Devicereader != nil {
+		devicereader_value = types.BoolValue(*obj.Devicereader)
+	}
+	var vsysadmin_value types.Bool
+	if obj.Vsysadmin != nil {
+		vsysadmin_value = types.BoolValue(*obj.Vsysadmin)
+	}
+	var vsysreader_value types.Bool
+	if obj.Vsysreader != nil {
+		vsysreader_value = types.BoolValue(*obj.Vsysreader)
+	}
+	o.Superuser = superuser_value
+	o.Superreader = superreader_value
+	o.Deviceadmin = deviceadmin_value
+	o.Devicereader = devicereader_value
+	o.Vsysadmin = vsysadmin_value
+	o.Vsysreader = vsysreader_value
 	o.Custom = custom_object
 
 	return diags
 }
 
-func (o *AdministratorResourceRoleSuperuserObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.RoleSuperuser, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	return diags
-}
-
-func (o *AdministratorResourceRoleSuperreaderObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.RoleSuperreader, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	return diags
-}
-
-func (o *AdministratorResourceRoleDeviceadminObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.RoleDeviceadmin, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	return diags
-}
-
-func (o *AdministratorResourceRoleDevicereaderObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.RoleDevicereader, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	return diags
-}
-
-func (o *AdministratorResourceRoleVsysadminObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.RoleVsysadmin, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	return diags
-}
-
-func (o *AdministratorResourceRoleVsysreaderObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.RoleVsysreader, ev *EncryptedValuesManager) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	return diags
-}
-
-func (o *AdministratorResourceRoleCustomObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.RoleCustom, ev *EncryptedValuesManager) diag.Diagnostics {
+func (o *AdministratorResourcePermissionsRoleBasedCustomObject) CopyFromPango(ctx context.Context, client pangoutil.PangoClient, ancestors []Ancestor, obj *administrator.PermissionsRoleBasedCustom, ev *EncryptedValuesManager) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	var profile_value types.String
